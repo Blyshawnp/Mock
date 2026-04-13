@@ -7,7 +7,6 @@ namespace AppName.UI.ViewModels;
 public partial class TransferRecordViewModel : ViewModelBase
 {
     private readonly Action<TransferRecordViewModel> _onChanged;
-    private bool _isInitialized;
 
     public TransferRecordViewModel(TransferRecord model, Action<TransferRecordViewModel> onChanged)
     {
@@ -19,8 +18,6 @@ public partial class TransferRecordViewModel : ViewModelBase
         Notes = model.Notes ?? string.Empty;
         FollowUpRequired = model.FollowUpRequired;
         FollowUpDate = model.FollowUpDate;
-
-        _isInitialized = true;
     }
 
     public int AttemptNumber { get; }
@@ -94,11 +91,6 @@ public partial class TransferRecordViewModel : ViewModelBase
 
     private void NotifyChanged()
     {
-        if (!_isInitialized)
-        {
-            return;
-        }
-
         _onChanged.Invoke(this);
     }
 }

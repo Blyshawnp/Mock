@@ -165,12 +165,6 @@ public sealed class SessionStateService : ISessionStateService
 
     private void ApplyRulesAndValidation()
     {
-        CurrentSession ??= new EvaluationSession();
-        CurrentSession.Calls ??= [];
-        CurrentSession.Transfers ??= [];
-        CurrentSession.Review ??= new ReviewData();
-        CurrentSession.Warnings ??= [];
-
         var evaluatedResult = _evaluationRulesService.Evaluate(CurrentSession);
         CurrentSession.Result = evaluatedResult ?? new EvaluationResult();
 

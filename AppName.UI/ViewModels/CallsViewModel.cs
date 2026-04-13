@@ -1,7 +1,5 @@
 using AppName.Core.Interfaces.Services;
 using AppName.Core.Models.Common;
-using AppName.Core.Models.Review;
-using AppName.Core.Models.Sessions;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.ObjectModel;
 
@@ -12,7 +10,6 @@ public partial class CallsViewModel : ViewModelBase
     private readonly ISessionStateService _sessionStateService;
     private readonly ILookupTableService _lookupTableService;
     private readonly SemaphoreSlim _lookupLoadLock = new(1, 1);
-    private bool _isInitializing = true;
 
     public CallsViewModel(
         ISessionStateService sessionStateService,
@@ -21,18 +18,19 @@ public partial class CallsViewModel : ViewModelBase
         _sessionStateService = sessionStateService;
         _lookupTableService = lookupTableService;
 
-        Calls = [];
-        Warnings = [];
-        CoachingReasonOptions = [];
-        FailReasonOptions = [];
-
-        SyncCalls(_sessionStateService.CurrentSession);
-        RefreshFromSession();
-
         _sessionStateService.SessionChanged += OnSessionChanged;
-        _isInitializing = false;
+
+        Calls = new ObservableCollection<CallRecordViewModel>(
+            _sessionStateService.CurrentSession.Calls
+                .OrderBy(x => x.CallNumber)
+                .Select(x => new CallRecordViewModel(x, HandleCallChanged)));
+
+        Warnings = new ObservableCollection<AppWarning>();
+        CoachingReasonOptions = new ObservableCollection<string>();
+        FailReasonOptions = new ObservableCollection<string>();
 
         _ = LoadLookupOptionsAsync();
+        RefreshFromSession();
     }
 
     public ObservableCollection<CallRecordViewModel> Calls { get; }
@@ -95,11 +93,6 @@ public partial class CallsViewModel : ViewModelBase
 
     private void HandleCallChanged(CallRecordViewModel call)
     {
-        if (_isInitializing)
-        {
-            return;
-        }
-
         _sessionStateService.UpdateCall(call.ToModel());
     }
 
@@ -110,64 +103,22 @@ public partial class CallsViewModel : ViewModelBase
 
     private void RefreshFromSession()
     {
-        var session = _sessionStateService.CurrentSession ?? new EvaluationSession();
-
-        SyncCalls(session);
-
-        ShowCall3 = session.Result?.ShowCall3 ?? true;
+        var session = _sessionStateService.CurrentSession;
+        ShowCall3 = session.Result.ShowCall3;
         ProgressPercent = session.ProgressPercent;
 
         foreach (var callVm in Calls)
         {
-            var model = session.Calls?.FirstOrDefault(x => x.CallNumber == callVm.CallNumber);
-            callVm.IsVisible = model?.IsVisible ?? true;
+            var model = session.Calls.First(x => x.CallNumber == callVm.CallNumber);
+            callVm.IsVisible = model.IsVisible;
         }
 
         Warnings.Clear();
-        foreach (var warning in _sessionStateService.GetCurrentWarnings() ?? Array.Empty<AppWarning>())
+        foreach (var warning in _sessionStateService.GetCurrentWarnings())
         {
             Warnings.Add(warning);
         }
 
         HasWarnings = Warnings.Count > 0;
-    }
-
-    private void SyncCalls(EvaluationSession session)
-    {
-        var safeCalls = session.Calls ?? [];
-
-        foreach (var model in safeCalls.OrderBy(x => x.CallNumber))
-        {
-            var existing = Calls.FirstOrDefault(x => x.CallNumber == model.CallNumber);
-            if (existing is not null)
-            {
-                continue;
-            }
-
-            Calls.Add(new CallRecordViewModel(model, HandleCallChanged));
-        }
-
-        var toRemove = Calls
-            .Where(vm => safeCalls.All(model => model.CallNumber != vm.CallNumber))
-            .ToList();
-
-        foreach (var vm in toRemove)
-        {
-            Calls.Remove(vm);
-        }
-
-        if (session.Result is null)
-        {
-            session.Result = new EvaluationResult();
-        }
-
-        if (session.Review is null)
-        {
-            session.Review = new ReviewData();
-        }
-
-        session.Calls ??= [];
-        session.Transfers ??= [];
-        session.Warnings ??= [];
     }
 }

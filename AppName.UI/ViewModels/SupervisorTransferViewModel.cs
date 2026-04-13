@@ -1,7 +1,5 @@
 using AppName.Core.Interfaces.Services;
 using AppName.Core.Models.Common;
-using AppName.Core.Models.Review;
-using AppName.Core.Models.Sessions;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.ObjectModel;
 
@@ -12,7 +10,6 @@ public partial class SupervisorTransferViewModel : ViewModelBase
     private readonly ISessionStateService _sessionStateService;
     private readonly ILookupTableService _lookupTableService;
     private readonly SemaphoreSlim _reasonLoadLock = new(1, 1);
-    private bool _isInitializing = true;
 
     public SupervisorTransferViewModel(
         ISessionStateService sessionStateService,
@@ -21,17 +18,18 @@ public partial class SupervisorTransferViewModel : ViewModelBase
         _sessionStateService = sessionStateService;
         _lookupTableService = lookupTableService;
 
-        Transfers = [];
-        Warnings = [];
-        SupervisorReasonOptions = [];
-
-        SyncTransfers(_sessionStateService.CurrentSession);
-        RefreshFromSession();
-
         _sessionStateService.SessionChanged += OnSessionChanged;
-        _isInitializing = false;
+
+        Transfers = new ObservableCollection<TransferRecordViewModel>(
+            _sessionStateService.CurrentSession.Transfers
+                .OrderBy(x => x.AttemptNumber)
+                .Select(x => new TransferRecordViewModel(x, HandleTransferChanged)));
+
+        Warnings = new ObservableCollection<AppWarning>();
+        SupervisorReasonOptions = new ObservableCollection<string>();
 
         _ = InitializeReasonsAsync();
+        RefreshWarnings();
     }
 
     public ObservableCollection<TransferRecordViewModel> Transfers { get; }
@@ -88,70 +86,22 @@ public partial class SupervisorTransferViewModel : ViewModelBase
 
     private void HandleTransferChanged(TransferRecordViewModel transfer)
     {
-        if (_isInitializing)
-        {
-            return;
-        }
-
         _sessionStateService.UpdateTransfer(transfer.ToModel());
     }
 
     private void OnSessionChanged(object? sender, EventArgs e)
     {
-        RefreshFromSession();
+        RefreshWarnings();
     }
 
-    private void RefreshFromSession()
+    private void RefreshWarnings()
     {
-        var session = _sessionStateService.CurrentSession ?? new EvaluationSession();
-        SyncTransfers(session);
-
         Warnings.Clear();
-        foreach (var warning in _sessionStateService.GetCurrentWarnings()
-                     .Where(x => (x.RelatedSection ?? string.Empty).StartsWith("Transfer", StringComparison.OrdinalIgnoreCase)))
+        foreach (var warning in _sessionStateService.GetCurrentWarnings().Where(x => x.RelatedSection.StartsWith("Transfer", StringComparison.OrdinalIgnoreCase)))
         {
             Warnings.Add(warning);
         }
 
         HasWarnings = Warnings.Count > 0;
-    }
-
-    private void SyncTransfers(EvaluationSession session)
-    {
-        var safeTransfers = session.Transfers ?? [];
-
-        foreach (var model in safeTransfers.OrderBy(x => x.AttemptNumber))
-        {
-            var existing = Transfers.FirstOrDefault(x => x.AttemptNumber == model.AttemptNumber);
-            if (existing is not null)
-            {
-                continue;
-            }
-
-            Transfers.Add(new TransferRecordViewModel(model, HandleTransferChanged));
-        }
-
-        var toRemove = Transfers
-            .Where(vm => safeTransfers.All(model => model.AttemptNumber != vm.AttemptNumber))
-            .ToList();
-
-        foreach (var vm in toRemove)
-        {
-            Transfers.Remove(vm);
-        }
-
-        if (session.Result is null)
-        {
-            session.Result = new EvaluationResult();
-        }
-
-        if (session.Review is null)
-        {
-            session.Review = new ReviewData();
-        }
-
-        session.Calls ??= [];
-        session.Transfers ??= [];
-        session.Warnings ??= [];
     }
 }
