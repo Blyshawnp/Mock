@@ -1,0 +1,29 @@
+<UserControl x:Class="AppName.UI.Controls.PassFailToggleControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignHeight="40"
+             d:DesignWidth="260">
+    <StackPanel Orientation="Horizontal">
+        <RadioButton x:Name="PassOption"
+                     Width="84"
+                     Checked="PassOption_OnChecked"
+                     Content="Pass"
+                     Style="{StaticResource PassFailRadioButtonStyle}"
+                     GroupName="CallOutcomeGroup" />
+        <RadioButton x:Name="FailOption"
+                     Width="84"
+                     Checked="FailOption_OnChecked"
+                     Content="Fail"
+                     Style="{StaticResource PassFailRadioButtonStyle}"
+                     GroupName="CallOutcomeGroup" />
+        <RadioButton x:Name="NotScoredOption"
+                     Width="84"
+                     Checked="NotScoredOption_OnChecked"
+                     Content="N/A"
+                     Style="{StaticResource PassFailRadioButtonStyle}"
+                     GroupName="CallOutcomeGroup" />
+    </StackPanel>
+</UserControl>

@@ -1,0 +1,69 @@
+<UserControl x:Class="AppName.UI.Views.TutorialView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignHeight="800"
+             d:DesignWidth="1000">
+    <Grid Margin="20">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250" />
+            <ColumnDefinition Width="280" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.ColumnSpan="3"
+                   Style="{StaticResource PageTitleTextBlockStyle}"
+                   Text="Tutorial (Read-Only)" />
+
+        <GroupBox Grid.Row="1" Header="Categories" Margin="0,12,12,12">
+            <ListBox ItemsSource="{Binding Categories}"
+                     SelectedItem="{Binding SelectedCategory, Mode=TwoWay}" />
+        </GroupBox>
+
+        <GroupBox Grid.Row="1" Grid.Column="1" Header="Topics" Margin="0,12,12,12">
+            <ListBox ItemsSource="{Binding Topics}"
+                     SelectedItem="{Binding SelectedTopic, Mode=TwoWay}"
+                     DisplayMemberPath="Title" />
+        </GroupBox>
+
+        <GroupBox Grid.Row="1" Grid.Column="2" Header="Step Details" Margin="0,12,0,12">
+            <Grid Margin="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <TextBlock FontSize="16" FontWeight="SemiBold" Text="{Binding SelectedTopic.Title}" />
+                <TextBlock Grid.Row="1"
+                           Margin="0,6,0,10"
+                           Foreground="DarkSlateGray"
+                           Text="{Binding CurrentStep.StepNumber, StringFormat=Step {0}}" />
+                <StackPanel Grid.Row="2">
+                    <TextBlock FontWeight="Bold" Text="{Binding CurrentStep.Title}" />
+                    <TextBlock Margin="0,8,0,0" TextWrapping="Wrap" Text="{Binding CurrentStep.Body}" />
+                    <TextBlock Margin="0,10,0,0" Foreground="DarkSlateBlue" TextWrapping="Wrap" Text="{Binding CurrentStep.Tip, StringFormat=Tip: {0}}" />
+                </StackPanel>
+
+                <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,12,0,0">
+                    <Button Content="Previous" Command="{Binding PreviousStepCommand}" Margin="0,0,8,0" />
+                    <Button Content="Next" Command="{Binding NextStepCommand}" Margin="0,0,8,0" />
+                    <Button Content="Mark Tutorial Complete" Command="{Binding MarkTutorialCompleteCommand}" />
+                </StackPanel>
+            </Grid>
+        </GroupBox>
+
+        <TextBlock Grid.Row="2"
+                   Grid.ColumnSpan="3"
+                   Foreground="DarkSlateGray"
+                   Text="{Binding StatusMessage}" />
+    </Grid>
+</UserControl>

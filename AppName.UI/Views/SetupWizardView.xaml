@@ -1,0 +1,168 @@
+<UserControl x:Class="AppName.UI.Views.SetupWizardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:converters="clr-namespace:AppName.UI.Converters"
+             mc:Ignorable="d"
+             d:DesignHeight="800"
+             d:DesignWidth="1000">
+    <UserControl.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+    </UserControl.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Style="{StaticResource PageTitleTextBlockStyle}"
+                   Text="Setup Wizard" />
+
+        <TextBlock Grid.Row="1"
+                   Margin="0,8,0,12"
+                   Foreground="DarkSlateGray"
+                   Text="Configure first-run operational settings only. Help/Tutorial content is non-editable and managed separately." />
+
+        <Border Grid.Row="2"
+                Padding="16"
+                BorderBrush="#FFDDDDDD"
+                BorderThickness="1"
+                CornerRadius="4"
+                Background="#FFF9F9F9">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <TextBlock FontSize="18"
+                           FontWeight="SemiBold"
+                           Text="{Binding CurrentStepTitle}" />
+
+                <ProgressBar Grid.Row="1"
+                             Margin="0,8,0,16"
+                             Minimum="0"
+                             Maximum="3"
+                             Value="{Binding CurrentStepIndex}" />
+
+                <Grid Grid.Row="2">
+                    <Grid.Resources>
+                        <Style TargetType="Grid">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </Style>
+                    </Grid.Resources>
+
+                    <Grid>
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding CurrentStepIndex}" Value="0">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <StackPanel>
+                            <TextBlock Text="Welcome!" FontWeight="Bold" />
+                            <TextBlock Margin="0,6,0,12"
+                                       Text="This wizard configures first-run operational behavior only. Help and Tutorial content remain read-only and outside Settings." />
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid>
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding CurrentStepIndex}" Value="1">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <StackPanel>
+                            <TextBlock Text="Operational Preferences" FontWeight="Bold" />
+                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                <TextBlock Width="160" VerticalAlignment="Center" Text="Theme (Light/Dark)" />
+                                <TextBox Width="180" Text="{Binding Theme, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                            <CheckBox Margin="0,10,0,0"
+                                      Content="Enable sounds"
+                                      IsChecked="{Binding SoundsEnabled, Mode=TwoWay}" />
+                            <CheckBox Margin="0,8,0,0"
+                                      Content="Enable beginner mode"
+                                      IsChecked="{Binding BeginnerModeEnabled, Mode=TwoWay}" />
+                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                <TextBlock Width="160" VerticalAlignment="Center" Text="Autosave (minutes)" />
+                                <TextBox Width="80"
+                                         Text="{Binding AutosaveMinutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid>
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding CurrentStepIndex}" Value="2">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <StackPanel>
+                            <TextBlock Text="Storage Defaults" FontWeight="Bold" />
+                            <TextBlock Margin="0,6,0,10" Text="Configure where generated operational outputs are saved by default." />
+                            <TextBlock Text="Default Save Folder" />
+                            <TextBox Margin="0,4,0,0"
+                                     Text="{Binding DefaultSaveFolder, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid>
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding CurrentStepIndex}" Value="3">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <StackPanel>
+                            <TextBlock Text="Review" FontWeight="Bold" />
+                            <TextBlock Margin="0,8,0,4" Text="Please confirm first-run operational settings:" />
+                            <TextBlock Text="{Binding Theme, StringFormat={}• Theme: {0}}" />
+                            <TextBlock Text="{Binding SoundsEnabled, StringFormat={}• Sounds Enabled: {0}}" />
+                            <TextBlock Text="{Binding BeginnerModeEnabled, StringFormat={}• Beginner Mode: {0}}" />
+                            <TextBlock Text="{Binding AutosaveMinutes, StringFormat={}• Autosave Minutes: {0}}" />
+                            <TextBlock Text="{Binding DefaultSaveFolder, StringFormat={}• Default Save Folder: {0}}" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <DockPanel Grid.Row="3" Margin="0,12,0,0">
+            <TextBlock VerticalAlignment="Center" Foreground="DarkSlateBlue" Text="{Binding StatusMessage}" />
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                <Button Content="Back"
+                        Command="{Binding PreviousStepCommand}"
+                        Margin="0,0,8,0" />
+                <Button Content="Next"
+                        Command="{Binding NextStepCommand}"
+                        Margin="0,0,8,0" />
+                <Button Content="Finish"
+                        Command="{Binding FinishCommand}" />
+            </StackPanel>
+        </DockPanel>
+    </Grid>
+</UserControl>

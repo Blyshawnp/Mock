@@ -1,0 +1,89 @@
+<UserControl x:Class="AppName.UI.Views.CallsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:AppName.UI.Controls"
+             xmlns:converters="clr-namespace:AppName.UI.Converters"
+             mc:Ignorable="d"
+             d:DesignHeight="800"
+             d:DesignWidth="1100">
+    <UserControl.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+    </UserControl.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0"
+                    Margin="0,0,0,10"
+                    Orientation="Horizontal">
+            <TextBlock Style="{StaticResource PageTitleTextBlockStyle}"
+                       Text="Calls" />
+            <TextBlock Margin="16,6,0,0"
+                       VerticalAlignment="Center"
+                       Text="Progress:" />
+            <TextBlock Margin="6,6,0,0"
+                       VerticalAlignment="Center"
+                       FontWeight="SemiBold"
+                       Text="{Binding ProgressPercent, StringFormat={}{0:F0}%}" />
+        </StackPanel>
+
+        <controls:WarningBannerControl Grid.Row="1"
+                                       Margin="0,0,0,16"
+                                       BannerVisibility="{Binding HasWarnings, Converter={StaticResource BoolToVisibilityConverter}}"
+                                       ItemsSource="{Binding Warnings}" />
+
+        <ScrollViewer Grid.Row="2">
+            <ItemsControl ItemsSource="{Binding Calls}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Style="{StaticResource WorkflowCardBorderStyle}"
+                                Visibility="{Binding IsVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <StackPanel>
+                                <TextBlock FontSize="16"
+                                           FontWeight="SemiBold"
+                                           Text="{Binding CallNumber, StringFormat=Call {0}}" />
+
+                                <controls:PassFailToggleControl Margin="0,8,0,8"
+                                                                Outcome="{Binding Outcome, Mode=TwoWay}" />
+
+                                <TextBlock Text="Coaching reason" />
+                                <ComboBox Margin="0,4,0,8"
+                                          ItemsSource="{Binding DataContext.CoachingReasonOptions, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                          SelectedItem="{Binding SelectedCoachingReason, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                                <controls:OtherTextInputControl Margin="0,0,0,8"
+                                                                Label="Coaching Other details"
+                                                                TextValue="{Binding OtherCoachingText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                Visibility="{Binding ShowOtherCoachingText, Converter={StaticResource BoolToVisibilityConverter}}"
+                                                                IsRequiredMessageVisible="{Binding ShowOtherCoachingText, Converter={StaticResource BoolToVisibilityConverter}}" />
+
+                                <TextBlock Text="Fail reason" />
+                                <ComboBox Margin="0,4,0,8"
+                                          ItemsSource="{Binding DataContext.FailReasonOptions, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                          SelectedItem="{Binding SelectedFailReason, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                                <controls:OtherTextInputControl Margin="0,0,0,8"
+                                                                Label="Fail Other details"
+                                                                TextValue="{Binding OtherFailText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                Visibility="{Binding ShowOtherFailText, Converter={StaticResource BoolToVisibilityConverter}}"
+                                                                IsRequiredMessageVisible="{Binding ShowOtherFailText, Converter={StaticResource BoolToVisibilityConverter}}" />
+
+                                <TextBlock Text="Notes" />
+                                <TextBox Height="68"
+                                         AcceptsReturn="True"
+                                         TextWrapping="Wrap"
+                                         Text="{Binding Notes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>
