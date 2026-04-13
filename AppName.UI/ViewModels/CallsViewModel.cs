@@ -1,5 +1,6 @@
 using AppName.Core.Interfaces.Services;
 using AppName.Core.Models.Common;
+using AppName.Core.Models.Sessions;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.ObjectModel;
 
@@ -20,8 +21,11 @@ public partial class CallsViewModel : ViewModelBase
 
         _sessionStateService.SessionChanged += OnSessionChanged;
 
+        var initialCalls = _sessionStateService.CurrentSession?.Calls
+            ?? new List<CallRecord>();
+
         Calls = new ObservableCollection<CallRecordViewModel>(
-            _sessionStateService.CurrentSession.Calls
+            initialCalls
                 .OrderBy(x => x.CallNumber)
                 .Select(x => new CallRecordViewModel(x, HandleCallChanged)));
 
@@ -82,7 +86,6 @@ public partial class CallsViewModel : ViewModelBase
         }
         catch (OperationCanceledException)
         {
-            // No-op by design for view shutdown or explicit cancellation.
         }
         finally
         {
@@ -104,17 +107,28 @@ public partial class CallsViewModel : ViewModelBase
     private void RefreshFromSession()
     {
         var session = _sessionStateService.CurrentSession;
-        ShowCall3 = session.Result.ShowCall3;
+        if (session == null)
+        {
+            return;
+        }
+
+        var result = session.Result;
+        ShowCall3 = result?.ShowCall3 ?? true;
         ProgressPercent = session.ProgressPercent;
+
+        var sessionCalls = session.Calls ?? new List<CallRecord>();
 
         foreach (var callVm in Calls)
         {
-            var model = session.Calls.First(x => x.CallNumber == callVm.CallNumber);
-            callVm.IsVisible = model.IsVisible;
+            var model = sessionCalls.FirstOrDefault(x => x.CallNumber == callVm.CallNumber);
+            if (model is not null)
+            {
+                callVm.IsVisible = model.IsVisible;
+            }
         }
 
         Warnings.Clear();
-        foreach (var warning in _sessionStateService.GetCurrentWarnings())
+        foreach (var warning in _sessionStateService.GetCurrentWarnings() ?? Array.Empty<AppWarning>())
         {
             Warnings.Add(warning);
         }

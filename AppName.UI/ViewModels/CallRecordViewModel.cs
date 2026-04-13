@@ -8,10 +8,12 @@ public partial class CallRecordViewModel : ViewModelBase
 {
     private const string OtherValue = "Other";
     private readonly Action<CallRecordViewModel> _onChanged;
+    private bool _isInitializing;
 
     public CallRecordViewModel(CallRecord model, Action<CallRecordViewModel> onChanged)
     {
         _onChanged = onChanged;
+        _isInitializing = true;
 
         CallNumber = model.CallNumber;
         Outcome = model.Outcome;
@@ -21,6 +23,8 @@ public partial class CallRecordViewModel : ViewModelBase
         OtherFailText = model.OtherFailText ?? string.Empty;
         Notes = model.Notes ?? string.Empty;
         IsVisible = model.IsVisible;
+
+        _isInitializing = false;
     }
 
     public int CallNumber { get; }
@@ -75,12 +79,12 @@ public partial class CallRecordViewModel : ViewModelBase
     public CallRecord ToModel()
     {
         var coaching = string.IsNullOrWhiteSpace(SelectedCoachingReason)
-            ? []
-            : [SelectedCoachingReason];
+            ? new List<string>()
+            : new List<string> { SelectedCoachingReason };
 
         var failReasons = string.IsNullOrWhiteSpace(SelectedFailReason)
-            ? []
-            : [SelectedFailReason];
+            ? new List<string>()
+            : new List<string> { SelectedFailReason };
 
         return new CallRecord
         {
@@ -98,6 +102,11 @@ public partial class CallRecordViewModel : ViewModelBase
 
     private void NotifyChanged()
     {
+        if (_isInitializing)
+        {
+            return;
+        }
+
         _onChanged.Invoke(this);
     }
 }
