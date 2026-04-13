@@ -1,0 +1,40 @@
+<Window x:Class="AppName.UI.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:views="clr-namespace:AppName.UI.Views"
+        mc:Ignorable="d"
+        Title="AppName"
+        Height="900"
+        Width="1200"
+        WindowStartupLocation="CenterScreen">
+    <Grid>
+        <TabControl>
+            <TabItem Header="Calls">
+                <views:CallsView x:Name="CallsViewHost" />
+            </TabItem>
+            <TabItem Header="Supervisor Transfer">
+                <views:SupervisorTransferView x:Name="SupervisorTransferViewHost" />
+            </TabItem>
+            <TabItem Header="Review">
+                <views:ReviewView x:Name="ReviewViewHost" />
+            </TabItem>
+            <TabItem Header="Setup Wizard">
+                <views:SetupWizardView x:Name="SetupWizardViewHost" />
+            </TabItem>
+            <TabItem Header="Tutorial">
+                <views:TutorialView x:Name="TutorialViewHost" />
+            </TabItem>
+            <TabItem Header="Help">
+                <views:HelpView x:Name="HelpViewHost" />
+            </TabItem>
+            <TabItem Header="Newbie Shift">
+                <views:NewbieShiftView x:Name="NewbieShiftViewHost" />
+            </TabItem>
+            <TabItem Header="Settings">
+                <views:SettingsView x:Name="SettingsViewHost" />
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>
