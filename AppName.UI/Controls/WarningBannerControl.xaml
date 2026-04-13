@@ -1,0 +1,25 @@
+<UserControl x:Class="AppName.UI.Controls.WarningBannerControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignHeight="120"
+             d:DesignWidth="500">
+    <Border Padding="10"
+            Background="{StaticResource Brush.WarningBackground}"
+            BorderBrush="{StaticResource Brush.WarningBorder}"
+            BorderThickness="1"
+            CornerRadius="4"
+            Visibility="{Binding BannerVisibility, RelativeSource={RelativeSource AncestorType=UserControl}}">
+        <ItemsControl ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource AncestorType=UserControl}}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Margin="0,2,0,2"
+                               Text="{Binding Message}"
+                               TextWrapping="Wrap" />
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </Border>
+</UserControl>

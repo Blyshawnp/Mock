@@ -1,0 +1,76 @@
+<UserControl x:Class="AppName.UI.Views.SupervisorTransferView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:AppName.UI.Controls"
+             xmlns:converters="clr-namespace:AppName.UI.Converters"
+             xmlns:enums="clr-namespace:AppName.Core.Models.Enums;assembly=AppName.Core"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             mc:Ignorable="d"
+             d:DesignHeight="700"
+             d:DesignWidth="1000">
+    <UserControl.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <ObjectDataProvider x:Key="TransferOutcomeValues"
+                            MethodName="GetValues"
+                            ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="enums:TransferOutcome" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+    </UserControl.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Style="{StaticResource PageTitleTextBlockStyle}"
+                   Text="Supervisor Transfer" />
+
+        <controls:WarningBannerControl Grid.Row="1"
+                                       Margin="0,12,0,12"
+                                       BannerVisibility="{Binding HasWarnings, Converter={StaticResource BoolToVisibilityConverter}}"
+                                       ItemsSource="{Binding Warnings}" />
+
+        <ItemsControl Grid.Row="2"
+                      ItemsSource="{Binding Transfers}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border Style="{StaticResource WorkflowCardBorderStyle}">
+                        <StackPanel>
+                            <TextBlock FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Text="{Binding AttemptNumber, StringFormat=Attempt {0}}" />
+
+                            <TextBlock Margin="0,8,0,4" Text="Outcome" />
+                            <ComboBox ItemsSource="{Binding Source={StaticResource TransferOutcomeValues}}"
+                                      SelectedItem="{Binding Outcome, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                            <TextBlock Margin="0,8,0,4" Text="Reason" />
+                            <ComboBox ItemsSource="{Binding DataContext.SupervisorReasonOptions, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                      SelectedItem="{Binding Reason, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                            <StackPanel Visibility="{Binding ShowFollowUpFields, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <CheckBox Margin="0,8,0,4"
+                                          Content="Follow-up required"
+                                          IsChecked="{Binding FollowUpRequired, Mode=TwoWay}" />
+
+                                <DatePicker SelectedDate="{Binding FollowUpDateForPicker, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+
+                            <TextBlock Margin="0,8,0,4" Text="Notes" />
+                            <TextBox Height="64"
+                                     AcceptsReturn="True"
+                                     TextWrapping="Wrap"
+                                     Text="{Binding Notes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </Grid>
+</UserControl>
