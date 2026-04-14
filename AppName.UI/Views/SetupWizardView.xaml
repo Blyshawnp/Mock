@@ -1,0 +1,206 @@
+<UserControl x:Class="AppName.UI.Views.SetupWizardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:converters="clr-namespace:AppName.UI.Converters"
+             mc:Ignorable="d"
+             d:DesignHeight="800"
+             d:DesignWidth="1100">
+    <UserControl.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+    </UserControl.Resources>
+
+    <Grid>
+        <ScrollViewer>
+            <Grid Margin="24">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Style="{StaticResource PageTitleTextBlockStyle}" Text="The Basics" />
+
+                <Border Grid.Row="1" Style="{StaticResource WorkflowCardBorderStyle}" Margin="0,18,0,12">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.ColumnSpan="2" Style="{StaticResource SectionHeaderTextBlockStyle}" Text="Session Information" Margin="0,0,0,12" />
+
+                        <StackPanel Grid.Row="1">
+                            <Label Content="Tester" />
+                            <TextBox Text="{Binding TesterName, UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="1" Grid.Column="1" Margin="16,0,0,0">
+                            <Label Content="Candidate Name" />
+                            <TextBox Text="{Binding CandidateName, UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="2">
+                            <Label Content="Pronouns" />
+                            <ComboBox Width="240" HorizontalAlignment="Left" ItemsSource="{Binding PronounOptions}" SelectedItem="{Binding SelectedPronouns, Mode=TwoWay}" />
+                            <TextBlock Style="{StaticResource SubtleTextBlockStyle}" Text="Optional — for accurate summaries" />
+                        </StackPanel>
+
+                        <CheckBox Grid.Row="2" Grid.Column="1" Margin="16,32,0,0" Content="FINAL ATTEMPT" IsChecked="{Binding FinalAttempt}" Foreground="{StaticResource Brush.Danger}" FontWeight="SemiBold" />
+                    </Grid>
+                </Border>
+
+                <Border Grid.Row="2" Style="{StaticResource WorkflowCardBorderStyle}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource SectionHeaderTextBlockStyle}" Text="Headset Requirements" />
+                        <Grid Margin="0,10,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="260" />
+                                <ColumnDefinition Width="180" />
+                                <ColumnDefinition Width="180" />
+                            </Grid.ColumnDefinitions>
+                            <Label Content="Is the headset USB?" />
+                            <RadioButton Grid.Column="1" Content="Yes" IsChecked="{Binding IsHeadsetUsb}" GroupName="Usb" />
+                            <RadioButton Grid.Column="2" Content="No" GroupName="Usb" />
+                        </Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="260" />
+                                <ColumnDefinition Width="180" />
+                                <ColumnDefinition Width="180" />
+                            </Grid.ColumnDefinitions>
+                            <Label Content="Noise Cancelling Mic?" />
+                            <RadioButton Grid.Column="1" Content="Yes" IsChecked="{Binding HasNoiseCancellingMic}" GroupName="Noise" />
+                            <RadioButton Grid.Column="2" Content="No" GroupName="Noise" />
+                        </Grid>
+                        <Label Content="Brand / Model" />
+                        <TextBox Width="540" HorizontalAlignment="Left" Text="{Binding HeadsetModel, UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+                </Border>
+
+                <Grid Grid.Row="3" Margin="0,12,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Style="{StaticResource WorkflowCardBorderStyle}" Margin="0,0,8,0">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource SectionHeaderTextBlockStyle}" Text="VPN" />
+                            <Grid Margin="0,6,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="180" />
+                                    <ColumnDefinition Width="130" />
+                                    <ColumnDefinition Width="130" />
+                                </Grid.ColumnDefinitions>
+                                <Label Content="Has VPN?" />
+                                <RadioButton Grid.Column="1" Content="Yes" IsChecked="{Binding HasVpn}" GroupName="Vpn" />
+                                <RadioButton Grid.Column="2" Content="No" GroupName="Vpn" />
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="180" />
+                                    <ColumnDefinition Width="130" />
+                                    <ColumnDefinition Width="130" />
+                                </Grid.ColumnDefinitions>
+                                <Label Content="Can turn off?" />
+                                <RadioButton Grid.Column="1" Content="Yes" IsChecked="{Binding VpnCanTurnOff}" GroupName="VpnOff" />
+                                <RadioButton Grid.Column="2" Content="No" GroupName="VpnOff" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="1" Style="{StaticResource WorkflowCardBorderStyle}" Margin="8,0,0,0">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource SectionHeaderTextBlockStyle}" Text="Browser" />
+                            <Grid Margin="0,6,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="220" />
+                                    <ColumnDefinition Width="130" />
+                                    <ColumnDefinition Width="130" />
+                                </Grid.ColumnDefinitions>
+                                <Label Content="Default browser?" />
+                                <RadioButton Grid.Column="1" Content="Yes" IsChecked="{Binding DefaultBrowserSet}" GroupName="BrowserDefault" />
+                                <RadioButton Grid.Column="2" Content="No" GroupName="BrowserDefault" />
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="220" />
+                                    <ColumnDefinition Width="130" />
+                                    <ColumnDefinition Width="130" />
+                                </Grid.ColumnDefinitions>
+                                <Label Content="Extensions off?" />
+                                <RadioButton Grid.Column="1" Content="Yes" IsChecked="{Binding ExtensionsOff}" GroupName="Extensions" />
+                                <RadioButton Grid.Column="2" Content="No" GroupName="Extensions" />
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="220" />
+                                    <ColumnDefinition Width="130" />
+                                    <ColumnDefinition Width="130" />
+                                </Grid.ColumnDefinitions>
+                                <Label Content="Pop-ups allowed?" />
+                                <RadioButton Grid.Column="1" Content="Yes" IsChecked="{Binding PopupsAllowed}" GroupName="Popups" />
+                                <RadioButton Grid.Column="2" Content="No" GroupName="Popups" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <Border Grid.Row="4" Style="{StaticResource WorkflowCardBorderStyle}" Margin="0,12,0,0">
+                    <DockPanel>
+                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                            <Button Style="{StaticResource DangerButtonStyle}" Content="NC / NS" Command="{Binding MarkNcNsCommand}" Margin="0,0,8,0" />
+                            <Button Style="{StaticResource DangerButtonStyle}" Content="Not Ready" Command="{Binding MarkNotReadyCommand}" Margin="0,0,8,0" />
+                            <Button Style="{StaticResource DangerButtonStyle}" Content="Stopped Responding" Command="{Binding MarkStoppedRespondingCommand}" Margin="0,0,8,0" />
+                            <Button Style="{StaticResource SecondaryButtonStyle}" Content="Tech Issue" Command="{Binding OpenTechIssueDialogCommand}" />
+                        </StackPanel>
+                        <Button DockPanel.Dock="Right" Width="180" Style="{StaticResource PrimaryButtonStyle}" Content="Continue" Command="{Binding ContinueBasicsCommand}" />
+                    </DockPanel>
+                </Border>
+
+                <TextBlock Grid.Row="5" Margin="0,10,0,0" Style="{StaticResource SubtleTextBlockStyle}" Text="{Binding StatusMessage}" />
+            </Grid>
+        </ScrollViewer>
+
+        <Grid Background="#96060B14" Visibility="{Binding ShowTechIssueDialog, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Border Style="{StaticResource ModalCardStyle}">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource SectionHeaderTextBlockStyle}" Text="Technical Issues Log" />
+                    <TextBlock Margin="0,10,0,10" Style="{StaticResource SubtleTextBlockStyle}" Text="Select all issues that occurred during the session:" />
+                    <CheckBox Content="Internet speed issues" />
+                    <CheckBox Content="Calls would not route" />
+                    <CheckBox Content="No script pop" />
+                    <CheckBox Content="Discord issues" />
+                    <CheckBox Content="Other" />
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+                        <Button Style="{StaticResource SecondaryButtonStyle}" Content="Cancel" Command="{Binding CloseTechIssueDialogCommand}" />
+                        <Button Style="{StaticResource PrimaryButtonStyle}" Content="Continue" Command="{Binding ContinueFromTechIssuesCommand}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Grid Background="#96060B14" Visibility="{Binding ShowTransferConfirmDialog, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Border Style="{StaticResource ModalCardStyle}" Width="620">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource SectionHeaderTextBlockStyle}" HorizontalAlignment="Center" Text="Confirm" />
+                    <TextBlock Margin="0,12,0,20" Text="Is there enough time for Supervisor Transfers?" HorizontalAlignment="Center" />
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Width="140" Style="{StaticResource PrimaryButtonStyle}" Content="Yes" Command="{Binding ConfirmTransferTimeCommand}" CommandParameter="Yes" />
+                        <Button Width="140" Style="{StaticResource SecondaryButtonStyle}" Content="No" Command="{Binding ConfirmTransferTimeCommand}" CommandParameter="No" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

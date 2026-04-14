@@ -1,0 +1,35 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Color x:Key="Color.Background">#FF0B1326</Color>
+    <Color x:Key="Color.Sidebar">#FF0E214D</Color>
+    <Color x:Key="Color.Surface">#FF1A2340</Color>
+    <Color x:Key="Color.SurfaceMuted">#FF101A33</Color>
+    <Color x:Key="Color.Border">#FF27395F</Color>
+    <Color x:Key="Color.TextPrimary">#FFF4F8FF</Color>
+    <Color x:Key="Color.TextSecondary">#FF92A4C8</Color>
+
+    <Color x:Key="Color.Accent">#FF2F6FED</Color>
+    <Color x:Key="Color.AccentHover">#FF3F7FFF</Color>
+    <Color x:Key="Color.Success">#FF18B257</Color>
+    <Color x:Key="Color.Danger">#FFE4364C</Color>
+    <Color x:Key="Color.Warning">#FFE4A63A</Color>
+
+    <SolidColorBrush x:Key="Brush.Background" Color="{StaticResource Color.Background}" />
+    <SolidColorBrush x:Key="Brush.Sidebar" Color="{StaticResource Color.Sidebar}" />
+    <SolidColorBrush x:Key="Brush.Surface" Color="{StaticResource Color.Surface}" />
+    <SolidColorBrush x:Key="Brush.SurfaceMuted" Color="{StaticResource Color.SurfaceMuted}" />
+    <SolidColorBrush x:Key="Brush.Border" Color="{StaticResource Color.Border}" />
+    <SolidColorBrush x:Key="Brush.TextPrimary" Color="{StaticResource Color.TextPrimary}" />
+    <SolidColorBrush x:Key="Brush.TextSecondary" Color="{StaticResource Color.TextSecondary}" />
+    <SolidColorBrush x:Key="Brush.Accent" Color="{StaticResource Color.Accent}" />
+    <SolidColorBrush x:Key="Brush.AccentHover" Color="{StaticResource Color.AccentHover}" />
+    <SolidColorBrush x:Key="Brush.Success" Color="{StaticResource Color.Success}" />
+    <SolidColorBrush x:Key="Brush.Danger" Color="{StaticResource Color.Danger}" />
+    <SolidColorBrush x:Key="Brush.Warning" Color="{StaticResource Color.Warning}" />
+    <SolidColorBrush x:Key="Brush.WarningBackground" Color="#332A1B10" />
+    <SolidColorBrush x:Key="Brush.WarningBorder" Color="#FFB48632" />
+    <SolidColorBrush x:Key="Brush.PassBackground" Color="#1A17B657" />
+    <SolidColorBrush x:Key="Brush.PassBorder" Color="#FF17B657" />
+    <SolidColorBrush x:Key="Brush.FailBackground" Color="#26E4364C" />
+    <SolidColorBrush x:Key="Brush.FailBorder" Color="#FFE4364C" />
+</ResourceDictionary>
