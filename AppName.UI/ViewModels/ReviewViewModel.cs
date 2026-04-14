@@ -14,6 +14,7 @@ public partial class ReviewViewModel : ViewModelBase
     private readonly ISessionStateService _sessionStateService;
     private readonly ISummaryService _summaryService;
     private readonly ILogService _logService;
+    private bool _isInitializing = true;
 
     public ReviewViewModel(
         ISessionStateService sessionStateService,
@@ -24,11 +25,12 @@ public partial class ReviewViewModel : ViewModelBase
         _summaryService = summaryService;
         _logService = logService;
 
-        _sessionStateService.SessionChanged += OnSessionChanged;
-
-        Warnings = new ObservableCollection<AppWarning>();
+        Warnings = [];
 
         LoadFromSession();
+
+        _sessionStateService.SessionChanged += OnSessionChanged;
+        _isInitializing = false;
     }
 
     public ObservableCollection<AppWarning> Warnings { get; }
@@ -162,9 +164,10 @@ public partial class ReviewViewModel : ViewModelBase
 
     private void LoadFromSession()
     {
-        var review = _sessionStateService.CurrentSession.Review ?? new ReviewData();
-        CoachingSummary = review.CoachingSummary;
-        FailSummary = review.FailSummary;
+        var session = _sessionStateService.CurrentSession ?? new EvaluationSession();
+        var review = session.Review ?? new ReviewData();
+        CoachingSummary = review.CoachingSummary ?? string.Empty;
+        FailSummary = review.FailSummary ?? string.Empty;
         SubmitConfirmed = review.SubmitConfirmed;
 
         RefreshWarningsAndReadiness();
@@ -177,13 +180,15 @@ public partial class ReviewViewModel : ViewModelBase
 
     private void RefreshWarningsAndReadiness()
     {
+        var session = _sessionStateService.CurrentSession ?? new EvaluationSession();
+
         Warnings.Clear();
-        foreach (var warning in _sessionStateService.GetCurrentWarnings())
+        foreach (var warning in _sessionStateService.GetCurrentWarnings() ?? Array.Empty<AppWarning>())
         {
             Warnings.Add(warning);
         }
 
-        SessionSummary = BuildSessionSummary(_sessionStateService.CurrentSession);
+        SessionSummary = BuildSessionSummary(session);
         HasWarnings = Warnings.Count > 0;
         IsReadyForSubmit = !Warnings.Any(x => x.Severity == Core.Models.Enums.WarningSeverity.Error)
                            && !string.IsNullOrWhiteSpace(CoachingSummary)
@@ -192,7 +197,12 @@ public partial class ReviewViewModel : ViewModelBase
 
     private void SaveReviewState(bool? coachingGenerated, bool? failGenerated)
     {
-        var existing = _sessionStateService.CurrentSession.Review ?? new ReviewData();
+        if (_isInitializing)
+        {
+            return;
+        }
+
+        var existing = _sessionStateService.CurrentSession?.Review ?? new ReviewData();
 
         var reviewData = new ReviewData
         {
@@ -218,13 +228,13 @@ public partial class ReviewViewModel : ViewModelBase
         builder.AppendLine($"Supervisor Follow-Up Required: {(result.RequiresSupervisorFollowUp ? "Yes" : "No")}");
 
         builder.AppendLine("Calls:");
-        foreach (var call in session.Calls.Where(x => x.IsVisible))
+        foreach (var call in (session.Calls ?? []).Where(x => x.IsVisible))
         {
             builder.AppendLine($"  - Call {call.CallNumber}: {call.Outcome}");
         }
 
         builder.AppendLine("Transfers:");
-        foreach (var transfer in session.Transfers)
+        foreach (var transfer in session.Transfers ?? [])
         {
             builder.AppendLine($"  - Attempt {transfer.AttemptNumber}: {transfer.Outcome} (Follow-Up: {(transfer.FollowUpRequired ? "Yes" : "No")})");
         }

@@ -9,5 +9,6 @@
     <Style x:Key="StatusBannerTextStyle" TargetType="TextBlock">
         <Setter Property="Foreground" Value="{StaticResource Brush.TextSecondary}" />
         <Setter Property="Margin" Value="0,8,0,0" />
+        <Setter Property="FontSize" Value="24" />
     </Style>
 </ResourceDictionary>

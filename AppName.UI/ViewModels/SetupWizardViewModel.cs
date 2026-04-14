@@ -1,5 +1,4 @@
 using AppName.Core.Interfaces.Services;
-using AppName.Core.Models.Config;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -8,231 +7,117 @@ namespace AppName.UI.ViewModels;
 public partial class SetupWizardViewModel : ViewModelBase
 {
     private readonly ISettingsService _settingsService;
-    private readonly SemaphoreSlim _initializeLock = new(1, 1);
 
     public SetupWizardViewModel(ISettingsService settingsService)
     {
         _settingsService = settingsService;
-        StepTitles = ["Welcome", "Preferences", "Storage", "Review"];
-        StatusMessage = "Loading setup...";
-
-        _ = EnsureInitializedAsync();
+        PronounOptions = ["", "He/Him", "She/Her", "They/Them"];
+        _ = InitializeAsync();
     }
 
-    public IReadOnlyList<string> StepTitles { get; }
+    public IReadOnlyList<string> PronounOptions { get; }
 
     [ObservableProperty]
-    private int currentStepIndex;
+    private string testerName = string.Empty;
 
     [ObservableProperty]
-    private bool isBusy;
+    private string candidateName = string.Empty;
 
     [ObservableProperty]
-    private bool isInitialized;
+    private string selectedPronouns = string.Empty;
 
     [ObservableProperty]
-    private string theme = "Light";
+    private bool finalAttempt;
 
     [ObservableProperty]
-    private bool soundsEnabled = true;
+    private bool isHeadsetUsb;
 
     [ObservableProperty]
-    private bool beginnerModeEnabled = true;
+    private bool hasNoiseCancellingMic;
 
     [ObservableProperty]
-    private int autosaveMinutes = 5;
+    private string headsetModel = string.Empty;
 
     [ObservableProperty]
-    private string defaultSaveFolder = string.Empty;
+    private bool hasVpn;
+
+    [ObservableProperty]
+    private bool vpnCanTurnOff;
+
+    [ObservableProperty]
+    private bool defaultBrowserSet;
+
+    [ObservableProperty]
+    private bool extensionsOff;
+
+    [ObservableProperty]
+    private bool popupsAllowed;
+
+    [ObservableProperty]
+    private bool showTechIssueDialog;
+
+    [ObservableProperty]
+    private bool showTransferConfirmDialog;
 
     [ObservableProperty]
     private string statusMessage = string.Empty;
 
-    public bool IsFirstStep => CurrentStepIndex == 0;
-
-    public bool IsLastStep => CurrentStepIndex >= StepTitles.Count - 1;
-
-    public string CurrentStepTitle => StepTitles[Math.Clamp(CurrentStepIndex, 0, StepTitles.Count - 1)];
-
-    private async Task EnsureInitializedAsync(CancellationToken cancellationToken = default)
+    private async Task InitializeAsync()
     {
-        if (IsInitialized)
-        {
-            return;
-        }
-
-        await _initializeLock.WaitAsync(cancellationToken);
         try
         {
-            if (IsInitialized)
-            {
-                return;
-            }
-
-            IsBusy = true;
-            var settings = await _settingsService.LoadAsync(cancellationToken);
-
-            Theme = string.IsNullOrWhiteSpace(settings.Theme) ? "Light" : settings.Theme;
-            SoundsEnabled = settings.SoundsEnabled;
-            BeginnerModeEnabled = settings.BeginnerModeEnabled;
-            AutosaveMinutes = settings.AutosaveMinutes <= 0 ? 5 : settings.AutosaveMinutes;
-            DefaultSaveFolder = settings.DefaultSaveFolder;
-
-            StatusMessage = settings.FirstRunComplete
-                ? "Setup already completed. You can review or update these first-run settings."
-                : "Complete setup to finish first-run configuration.";
-
-            IsInitialized = true;
+            var settings = await _settingsService.LoadAsync();
+            TesterName = string.IsNullOrWhiteSpace(settings.DisplayName) ? "Shawn Bly" : settings.DisplayName;
         }
-        catch (OperationCanceledException)
+        catch
         {
-            StatusMessage = "Setup initialization canceled.";
-        }
-        catch (Exception ex)
-        {
-            StatusMessage = $"Setup failed to initialize: {ex.Message}";
-        }
-        finally
-        {
-            IsBusy = false;
-            _initializeLock.Release();
-            RefreshComputedState();
+            TesterName = "Shawn Bly";
         }
     }
 
-    [RelayCommand(CanExecute = nameof(CanMoveNext))]
-    private void NextStep()
-    {
-        if (!ValidateCurrentStep(out var error))
-        {
-            StatusMessage = error;
-            return;
-        }
+    [RelayCommand]
+    private void OpenTechIssueDialog() => ShowTechIssueDialog = true;
 
-        CurrentStepIndex++;
-        StatusMessage = string.Empty;
-        RefreshComputedState();
+    [RelayCommand]
+    private void CloseTechIssueDialog() => ShowTechIssueDialog = false;
+
+    [RelayCommand]
+    private void ContinueFromTechIssues()
+    {
+        ShowTechIssueDialog = false;
+        ShowTransferConfirmDialog = true;
     }
 
-    [RelayCommand(CanExecute = nameof(CanMovePrevious))]
-    private void PreviousStep()
+    [RelayCommand]
+    private void ConfirmTransferTime(string result)
     {
-        if (CurrentStepIndex <= 0)
-        {
-            return;
-        }
-
-        CurrentStepIndex--;
-        StatusMessage = string.Empty;
-        RefreshComputedState();
+        ShowTransferConfirmDialog = false;
+        StatusMessage = result == "Yes"
+            ? "Confirmed: enough time for Supervisor Transfers."
+            : "Not enough time for Supervisor Transfers.";
     }
 
-    [RelayCommand(CanExecute = nameof(CanFinish))]
-    private async Task FinishAsync()
+    [RelayCommand]
+    private void MarkStoppedResponding()
     {
-        if (!ValidateAll(out var error))
-        {
-            StatusMessage = error;
-            return;
-        }
-
-        IsBusy = true;
-        try
-        {
-            var existing = await _settingsService.LoadAsync();
-            var updated = new AppSettings
-            {
-                Theme = Theme,
-                SoundsEnabled = SoundsEnabled,
-                BeginnerModeEnabled = BeginnerModeEnabled,
-                AutosaveMinutes = AutosaveMinutes,
-                DefaultSaveFolder = DefaultSaveFolder,
-                FirstRunComplete = true,
-                TutorialCompleted = existing.TutorialCompleted
-            };
-
-            await _settingsService.SaveAsync(updated);
-
-            StatusMessage = "Setup complete. First-run operational settings were saved.";
-        }
-        catch (Exception ex)
-        {
-            StatusMessage = $"Failed to save setup: {ex.Message}";
-        }
-        finally
-        {
-            IsBusy = false;
-            RefreshComputedState();
-        }
+        StatusMessage = "Marked as Stopped Responding.";
     }
 
-    partial void OnCurrentStepIndexChanged(int value) => RefreshComputedState();
-
-    partial void OnIsBusyChanged(bool value) => RefreshComputedState();
-
-    private bool CanMoveNext() => !IsBusy && !IsLastStep;
-
-    private bool CanMovePrevious() => !IsBusy && !IsFirstStep;
-
-    private bool CanFinish() => !IsBusy && IsLastStep;
-
-    private bool ValidateCurrentStep(out string error)
+    [RelayCommand]
+    private void MarkNotReady()
     {
-        error = string.Empty;
-
-        if (CurrentStepIndex == 1)
-        {
-            if (!string.Equals(Theme, "Light", StringComparison.OrdinalIgnoreCase)
-                && !string.Equals(Theme, "Dark", StringComparison.OrdinalIgnoreCase))
-            {
-                error = "Theme must be Light or Dark.";
-                return false;
-            }
-
-            if (AutosaveMinutes is < 1 or > 60)
-            {
-                error = "Autosave must be between 1 and 60 minutes.";
-                return false;
-            }
-        }
-
-        if (CurrentStepIndex == 2 && string.IsNullOrWhiteSpace(DefaultSaveFolder))
-        {
-            error = "Default save folder is required.";
-            return false;
-        }
-
-        return true;
+        StatusMessage = "Marked as Not Ready.";
     }
 
-    private bool ValidateAll(out string error)
+    [RelayCommand]
+    private void MarkNcNs()
     {
-        var originalStep = CurrentStepIndex;
-        for (var step = 0; step < StepTitles.Count - 1; step++)
-        {
-            CurrentStepIndex = step;
-            if (!ValidateCurrentStep(out error))
-            {
-                CurrentStepIndex = originalStep;
-                RefreshComputedState();
-                return false;
-            }
-        }
-
-        CurrentStepIndex = originalStep;
-        RefreshComputedState();
-        error = string.Empty;
-        return true;
+        StatusMessage = "Marked as NC / NS.";
     }
 
-    private void RefreshComputedState()
+    [RelayCommand]
+    private void ContinueBasics()
     {
-        OnPropertyChanged(nameof(IsFirstStep));
-        OnPropertyChanged(nameof(IsLastStep));
-        OnPropertyChanged(nameof(CurrentStepTitle));
-
-        NextStepCommand.NotifyCanExecuteChanged();
-        PreviousStepCommand.NotifyCanExecuteChanged();
-        FinishCommand.NotifyCanExecuteChanged();
+        StatusMessage = "Basics complete. Continue clicked.";
     }
 }

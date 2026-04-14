@@ -7,6 +7,7 @@ public static class UiServiceRegistration
 {
     public static IServiceCollection AddAppNameUi(this IServiceCollection services)
     {
+        services.AddTransient<HomeViewModel>();
         services.AddTransient<CallsViewModel>();
         services.AddTransient<SupervisorTransferViewModel>();
         services.AddTransient<ReviewViewModel>();

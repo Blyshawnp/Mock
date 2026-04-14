@@ -5,36 +5,102 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:views="clr-namespace:AppName.UI.Views"
         mc:Ignorable="d"
-        Title="AppName"
-        Height="900"
-        Width="1200"
+        Title="Mock Testing Suite"
+        Height="980"
+        Width="1600"
+        Background="{StaticResource Brush.Background}"
         WindowStartupLocation="CenterScreen">
     <Grid>
-        <TabControl>
-            <TabItem Header="Calls">
-                <views:CallsView x:Name="CallsViewHost" />
-            </TabItem>
-            <TabItem Header="Supervisor Transfer">
-                <views:SupervisorTransferView x:Name="SupervisorTransferViewHost" />
-            </TabItem>
-            <TabItem Header="Review">
-                <views:ReviewView x:Name="ReviewViewHost" />
-            </TabItem>
-            <TabItem Header="Setup Wizard">
-                <views:SetupWizardView x:Name="SetupWizardViewHost" />
-            </TabItem>
-            <TabItem Header="Tutorial">
-                <views:TutorialView x:Name="TutorialViewHost" />
-            </TabItem>
-            <TabItem Header="Help">
-                <views:HelpView x:Name="HelpViewHost" />
-            </TabItem>
-            <TabItem Header="Newbie Shift">
-                <views:NewbieShiftView x:Name="NewbieShiftViewHost" />
-            </TabItem>
-            <TabItem Header="Settings">
-                <views:SettingsView x:Name="SettingsViewHost" />
-            </TabItem>
-        </TabControl>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="34" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Border Background="#FF0A1328" BorderBrush="#1B2C4A" BorderThickness="0,0,0,1" Padding="10,0">
+            <TextBlock VerticalAlignment="Center"
+                       Foreground="#FF4EA7E7"
+                       FontFamily="Consolas"
+                       FontSize="17"
+                       Text="Welcome to the Mock Testing Suite. Designed to streamline your mock testing session. Feedback or suggested changes are appreciated!" />
+        </Border>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="280" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Background="{StaticResource Brush.Sidebar}">
+                <Grid Margin="12,16">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <StackPanel>
+                        <Border Width="80" Height="34" Background="#FF040E22" BorderBrush="#FF33517A" BorderThickness="1" CornerRadius="4" HorizontalAlignment="Center">
+                            <TextBlock Text="ACD" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" FontWeight="Bold" />
+                        </Border>
+                        <TextBlock Margin="0,14,0,0" Text="Mock Testing" HorizontalAlignment="Center" FontSize="44" FontWeight="SemiBold" />
+                        <TextBlock Text="Suite" HorizontalAlignment="Center" FontSize="44" FontWeight="SemiBold" />
+                        <TextBlock Text="v2.5.0" HorizontalAlignment="Center" Style="{StaticResource SubtleTextBlockStyle}" Margin="0,6,0,0" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="2" Margin="0,26,0,0">
+                        <Button Style="{StaticResource SidebarNavButtonStyle}" Content="🏠  Home" Tag="0" Click="NavButton_OnClick" />
+                        <Button Style="{StaticResource SidebarNavButtonStyle}" Content="📋  The Basics" Tag="1" Click="NavButton_OnClick" />
+                        <Button Style="{StaticResource SidebarNavButtonStyle}" Content="📞  Calls" Tag="2" Click="NavButton_OnClick" />
+                        <Button Style="{StaticResource SidebarNavButtonStyle}" Content="🔁  Sup Transfer" Tag="3" Click="NavButton_OnClick" />
+                        <Button Style="{StaticResource SidebarNavButtonStyle}" Content="📄  Review" Tag="4" Click="NavButton_OnClick" />
+                        <Button Style="{StaticResource SidebarNavButtonStyle}" Content="📊  History" Tag="5" Click="NavButton_OnClick" />
+                        <Button Style="{StaticResource SidebarNavButtonStyle}" Content="⚙️  Settings" Tag="6" Click="NavButton_OnClick" />
+                        <Button Style="{StaticResource SidebarNavButtonStyle}" Content="❓  Help" Tag="7" Click="NavButton_OnClick" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="3" Margin="0,12,0,0">
+                        <Button Style="{StaticResource UtilityButtonStyle}" Content="💬  Discord Post" />
+                        <Button Style="{StaticResource UtilityButtonSecondaryStyle}" Content="📊  Cert Spreadsheet" Margin="0,8,0,8" />
+                        <Button Style="{StaticResource DangerButtonStyle}" Content="🚪  Exit App" Click="ExitButton_OnClick" />
+                        <Border Height="16" Background="{StaticResource Brush.Danger}" Margin="0,16,0,0" CornerRadius="8" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <Grid Grid.Column="1" Margin="18,10,18,12">
+                <TabControl x:Name="ContentTabs" BorderThickness="0" Background="Transparent" SelectedIndex="0">
+                    <TabControl.Resources>
+                        <Style TargetType="TabItem">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </Style>
+                    </TabControl.Resources>
+                    <TabItem Header="Home">
+                        <views:HomeView x:Name="HomeViewHost" />
+                    </TabItem>
+                    <TabItem Header="The Basics">
+                        <views:SetupWizardView x:Name="SetupWizardViewHost" />
+                    </TabItem>
+                    <TabItem Header="Calls">
+                        <views:CallsView x:Name="CallsViewHost" />
+                    </TabItem>
+                    <TabItem Header="Supervisor Transfer">
+                        <views:SupervisorTransferView x:Name="SupervisorTransferViewHost" />
+                    </TabItem>
+                    <TabItem Header="Review">
+                        <views:ReviewView x:Name="ReviewViewHost" />
+                    </TabItem>
+                    <TabItem Header="History">
+                        <views:TutorialView x:Name="TutorialViewHost" />
+                    </TabItem>
+                    <TabItem Header="Settings">
+                        <views:SettingsView x:Name="SettingsViewHost" />
+                    </TabItem>
+                    <TabItem Header="Help">
+                        <views:HelpView x:Name="HelpViewHost" />
+                    </TabItem>
+                </TabControl>
+            </Grid>
+        </Grid>
     </Grid>
 </Window>
