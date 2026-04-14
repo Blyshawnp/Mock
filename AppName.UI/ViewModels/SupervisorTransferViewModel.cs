@@ -1,5 +1,6 @@
 using AppName.Core.Interfaces.Services;
 using AppName.Core.Models.Common;
+using AppName.Core.Models.Sessions;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.ObjectModel;
 
@@ -9,7 +10,7 @@ public partial class SupervisorTransferViewModel : ViewModelBase
 {
     private readonly ISessionStateService _sessionStateService;
     private readonly ILookupTableService _lookupTableService;
-    private readonly SemaphoreSlim _reasonLoadLock = new(1, 1);
+    private readonly SemaphoreSlim _lookupLoadLock = new(1, 1);
 
     public SupervisorTransferViewModel(
         ISessionStateService sessionStateService,
@@ -18,18 +19,21 @@ public partial class SupervisorTransferViewModel : ViewModelBase
         _sessionStateService = sessionStateService;
         _lookupTableService = lookupTableService;
 
-        _sessionStateService.SessionChanged += OnSessionChanged;
-
-        Transfers = new ObservableCollection<TransferRecordViewModel>(
-            _sessionStateService.CurrentSession.Transfers
-                .OrderBy(x => x.AttemptNumber)
-                .Select(x => new TransferRecordViewModel(x, HandleTransferChanged)));
-
         Warnings = new ObservableCollection<AppWarning>();
         SupervisorReasonOptions = new ObservableCollection<string>();
 
-        _ = InitializeReasonsAsync();
+        var initialTransfers = _sessionStateService.CurrentSession?.Transfers
+            ?? new List<TransferRecord>();
+
+        Transfers = new ObservableCollection<TransferRecordViewModel>(
+            initialTransfers
+                .OrderBy(x => x.AttemptNumber)
+                .Select(x => new TransferRecordViewModel(x, HandleTransferChanged)));
+
         RefreshWarnings();
+
+        _sessionStateService.SessionChanged += OnSessionChanged;
+        _ = InitializeReasonsAsync();
     }
 
     public ObservableCollection<TransferRecordViewModel> Transfers { get; }
@@ -44,24 +48,14 @@ public partial class SupervisorTransferViewModel : ViewModelBase
     [ObservableProperty]
     private bool isLookupLoading;
 
-    private async Task InitializeReasonsAsync()
+    private async Task InitializeReasonsAsync(CancellationToken cancellationToken = default)
     {
-        try
-        {
-            await LoadReasonsAsync();
-        }
-        catch (Exception)
-        {
-            // Keep view-model resilient during startup; empty options are acceptable fallback.
-        }
-    }
+        await _lookupLoadLock.WaitAsync(cancellationToken);
 
-    private async Task LoadReasonsAsync(CancellationToken cancellationToken = default)
-    {
-        await _reasonLoadLock.WaitAsync(cancellationToken);
         try
         {
             IsLookupLoading = true;
+
             var lookup = await _lookupTableService.GetLookupTablesAsync(cancellationToken);
 
             SupervisorReasonOptions.Clear();
@@ -75,12 +69,11 @@ public partial class SupervisorTransferViewModel : ViewModelBase
         }
         catch (OperationCanceledException)
         {
-            // No-op by design for view shutdown or explicit cancellation.
         }
         finally
         {
             IsLookupLoading = false;
-            _reasonLoadLock.Release();
+            _lookupLoadLock.Release();
         }
     }
 
@@ -92,16 +85,47 @@ public partial class SupervisorTransferViewModel : ViewModelBase
     private void OnSessionChanged(object? sender, EventArgs e)
     {
         RefreshWarnings();
+        RefreshTransferVisibility();
     }
 
     private void RefreshWarnings()
     {
+        var session = _sessionStateService.CurrentSession;
+        if (session == null)
+        {
+            return;
+        }
+
         Warnings.Clear();
-        foreach (var warning in _sessionStateService.GetCurrentWarnings().Where(x => x.RelatedSection.StartsWith("Transfer", StringComparison.OrdinalIgnoreCase)))
+
+        var currentWarnings = _sessionStateService.GetCurrentWarnings() ?? Array.Empty<AppWarning>();
+        foreach (var warning in currentWarnings)
         {
             Warnings.Add(warning);
         }
 
         HasWarnings = Warnings.Count > 0;
+    }
+
+    private void RefreshTransferVisibility()
+    {
+        var session = _sessionStateService.CurrentSession;
+        if (session?.Transfers == null)
+        {
+            return;
+        }
+
+        foreach (var transferVm in Transfers)
+        {
+            var model = session.Transfers.FirstOrDefault(x => x.AttemptNumber == transferVm.AttemptNumber);
+            if (model is not null)
+            {
+                transferVm.Outcome = model.Outcome;
+                transferVm.Reason = model.Reason ?? string.Empty;
+                transferVm.Notes = model.Notes ?? string.Empty;
+                transferVm.FollowUpRequired = model.FollowUpRequired;
+               transferVm.FollowUpDate = model.FollowUpDate?.LocalDateTime;
+            }
+        }
     }
 }
