@@ -15,4 +15,6 @@ public sealed class AppSettings
     public bool TutorialCompleted { get; set; }
 
     public bool BeginnerModeEnabled { get; set; } = true;
+
+    public string DisplayName { get; set; } = string.Empty;
 }

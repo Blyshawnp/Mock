@@ -7,6 +7,7 @@ namespace AppName.UI.ViewModels;
 public partial class SetupWizardViewModel : ViewModelBase
 {
     private readonly ISettingsService _settingsService;
+    private bool _isInitializing;
 
     public SetupWizardViewModel(ISettingsService settingsService)
     {
@@ -62,16 +63,32 @@ public partial class SetupWizardViewModel : ViewModelBase
     [ObservableProperty]
     private string statusMessage = string.Empty;
 
+    public bool IsTesterNameValid =>
+        !string.IsNullOrWhiteSpace(TesterName);
+
+    public string TesterNameError =>
+        IsTesterNameValid ? string.Empty : "Tester name is required.";
+
+    partial void OnTesterNameChanged(string value)
+    {
+        OnPropertyChanged(nameof(IsTesterNameValid));
+        OnPropertyChanged(nameof(TesterNameError));
+        ContinueBasicsCommand.NotifyCanExecuteChanged();
+    }
+
     private async Task InitializeAsync()
     {
         try
         {
+            _isInitializing = true;
+
             var settings = await _settingsService.LoadAsync();
-            TesterName = string.IsNullOrWhiteSpace(settings.DisplayName) ? "Shawn Bly" : settings.DisplayName;
+            TesterName = settings.DisplayName ?? string.Empty;
         }
-        catch
+        finally
         {
-            TesterName = "Shawn Bly";
+            _isInitializing = false;
+            ContinueBasicsCommand.NotifyCanExecuteChanged();
         }
     }
 
@@ -115,9 +132,18 @@ public partial class SetupWizardViewModel : ViewModelBase
         StatusMessage = "Marked as NC / NS.";
     }
 
-    [RelayCommand]
-    private void ContinueBasics()
+    [RelayCommand(CanExecute = nameof(CanContinueBasics))]
+    private async Task ContinueBasics()
     {
+        var settings = await _settingsService.LoadAsync();
+        settings.DisplayName = TesterName;
+        await _settingsService.SaveAsync(settings);
+
         StatusMessage = "Basics complete. Continue clicked.";
+    }
+
+    private bool CanContinueBasics()
+    {
+        return !_isInitializing && IsTesterNameValid;
     }
 }

@@ -37,25 +37,44 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
-                        <TextBlock Grid.ColumnSpan="2" Style="{StaticResource SectionHeaderTextBlockStyle}" Text="Session Information" Margin="0,0,0,12" />
+                        <TextBlock Grid.ColumnSpan="2"
+                                   Style="{StaticResource SectionHeaderTextBlockStyle}"
+                                   Text="Session Information"
+                                   Margin="0,0,0,12" />
 
                         <StackPanel Grid.Row="1">
                             <Label Content="Tester" />
                             <TextBox Text="{Binding TesterName, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock Margin="0,4,0,0"
+                                       Foreground="Red"
+                                       FontSize="12"
+                                       Text="{Binding TesterNameError}" />
                         </StackPanel>
 
-                        <StackPanel Grid.Row="1" Grid.Column="1" Margin="16,0,0,0">
+                        <StackPanel Grid.Row="1"
+                                    Grid.Column="1"
+                                    Margin="16,0,0,0">
                             <Label Content="Candidate Name" />
                             <TextBox Text="{Binding CandidateName, UpdateSourceTrigger=PropertyChanged}" />
                         </StackPanel>
 
                         <StackPanel Grid.Row="2">
                             <Label Content="Pronouns" />
-                            <ComboBox Width="240" HorizontalAlignment="Left" ItemsSource="{Binding PronounOptions}" SelectedItem="{Binding SelectedPronouns, Mode=TwoWay}" />
-                            <TextBlock Style="{StaticResource SubtleTextBlockStyle}" Text="Optional — for accurate summaries" />
+                            <ComboBox Width="240"
+                                      HorizontalAlignment="Left"
+                                      ItemsSource="{Binding PronounOptions}"
+                                      SelectedItem="{Binding SelectedPronouns, Mode=TwoWay}" />
+                            <TextBlock Style="{StaticResource SubtleTextBlockStyle}"
+                                       Text="Optional - for accurate summaries" />
                         </StackPanel>
 
-                        <CheckBox Grid.Row="2" Grid.Column="1" Margin="16,32,0,0" Content="FINAL ATTEMPT" IsChecked="{Binding FinalAttempt}" Foreground="{StaticResource Brush.Danger}" FontWeight="SemiBold" />
+                        <CheckBox Grid.Row="2"
+                                  Grid.Column="1"
+                                  Margin="16,32,0,0"
+                                  Content="FINAL ATTEMPT"
+                                  IsChecked="{Binding FinalAttempt}"
+                                  Foreground="{StaticResource Brush.Danger}"
+                                  FontWeight="SemiBold" />
                     </Grid>
                 </Border>
 
@@ -83,7 +102,9 @@
                             <RadioButton Grid.Column="2" Content="No" GroupName="Noise" />
                         </Grid>
                         <Label Content="Brand / Model" />
-                        <TextBox Width="540" HorizontalAlignment="Left" Text="{Binding HeadsetModel, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBox Width="540"
+                                 HorizontalAlignment="Left"
+                                 Text="{Binding HeadsetModel, UpdateSourceTrigger=PropertyChanged}" />
                     </StackPanel>
                 </Border>
 
@@ -159,45 +180,87 @@
                 <Border Grid.Row="4" Style="{StaticResource WorkflowCardBorderStyle}" Margin="0,12,0,0">
                     <DockPanel>
                         <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                            <Button Style="{StaticResource DangerButtonStyle}" Content="NC / NS" Command="{Binding MarkNcNsCommand}" Margin="0,0,8,0" />
-                            <Button Style="{StaticResource DangerButtonStyle}" Content="Not Ready" Command="{Binding MarkNotReadyCommand}" Margin="0,0,8,0" />
-                            <Button Style="{StaticResource DangerButtonStyle}" Content="Stopped Responding" Command="{Binding MarkStoppedRespondingCommand}" Margin="0,0,8,0" />
-                            <Button Style="{StaticResource SecondaryButtonStyle}" Content="Tech Issue" Command="{Binding OpenTechIssueDialogCommand}" />
+                            <Button Style="{StaticResource DangerButtonStyle}"
+                                    Content="NC / NS"
+                                    Command="{Binding MarkNcNsCommand}"
+                                    Margin="0,0,8,0" />
+                            <Button Style="{StaticResource DangerButtonStyle}"
+                                    Content="Not Ready"
+                                    Command="{Binding MarkNotReadyCommand}"
+                                    Margin="0,0,8,0" />
+                            <Button Style="{StaticResource DangerButtonStyle}"
+                                    Content="Stopped Responding"
+                                    Command="{Binding MarkStoppedRespondingCommand}"
+                                    Margin="0,0,8,0" />
+                            <Button Style="{StaticResource SecondaryButtonStyle}"
+                                    Content="Tech Issue"
+                                    Command="{Binding OpenTechIssueDialogCommand}" />
                         </StackPanel>
-                        <Button DockPanel.Dock="Right" Width="180" Style="{StaticResource PrimaryButtonStyle}" Content="Continue" Command="{Binding ContinueBasicsCommand}" />
+
+                        <Button DockPanel.Dock="Right"
+                                Width="180"
+                                Style="{StaticResource PrimaryButtonStyle}"
+                                Content="Continue"
+                                Command="{Binding ContinueBasicsCommand}"
+                                IsEnabled="{Binding IsTesterNameValid}" />
                     </DockPanel>
                 </Border>
 
-                <TextBlock Grid.Row="5" Margin="0,10,0,0" Style="{StaticResource SubtleTextBlockStyle}" Text="{Binding StatusMessage}" />
+                <TextBlock Grid.Row="5"
+                           Margin="0,10,0,0"
+                           Style="{StaticResource SubtleTextBlockStyle}"
+                           Text="{Binding StatusMessage}" />
             </Grid>
         </ScrollViewer>
 
-        <Grid Background="#96060B14" Visibility="{Binding ShowTechIssueDialog, Converter={StaticResource BoolToVisibilityConverter}}">
+        <Grid Background="#96060B14"
+              Visibility="{Binding ShowTechIssueDialog, Converter={StaticResource BoolToVisibilityConverter}}">
             <Border Style="{StaticResource ModalCardStyle}">
                 <StackPanel>
                     <TextBlock Style="{StaticResource SectionHeaderTextBlockStyle}" Text="Technical Issues Log" />
-                    <TextBlock Margin="0,10,0,10" Style="{StaticResource SubtleTextBlockStyle}" Text="Select all issues that occurred during the session:" />
+                    <TextBlock Margin="0,10,0,10"
+                               Style="{StaticResource SubtleTextBlockStyle}"
+                               Text="Select all issues that occurred during the session:" />
                     <CheckBox Content="Internet speed issues" />
                     <CheckBox Content="Calls would not route" />
                     <CheckBox Content="No script pop" />
                     <CheckBox Content="Discord issues" />
                     <CheckBox Content="Other" />
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
-                        <Button Style="{StaticResource SecondaryButtonStyle}" Content="Cancel" Command="{Binding CloseTechIssueDialogCommand}" />
-                        <Button Style="{StaticResource PrimaryButtonStyle}" Content="Continue" Command="{Binding ContinueFromTechIssuesCommand}" />
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                Margin="0,16,0,0">
+                        <Button Style="{StaticResource SecondaryButtonStyle}"
+                                Content="Cancel"
+                                Command="{Binding CloseTechIssueDialogCommand}" />
+                        <Button Style="{StaticResource PrimaryButtonStyle}"
+                                Content="Continue"
+                                Command="{Binding ContinueFromTechIssuesCommand}" />
                     </StackPanel>
                 </StackPanel>
             </Border>
         </Grid>
 
-        <Grid Background="#96060B14" Visibility="{Binding ShowTransferConfirmDialog, Converter={StaticResource BoolToVisibilityConverter}}">
+        <Grid Background="#96060B14"
+              Visibility="{Binding ShowTransferConfirmDialog, Converter={StaticResource BoolToVisibilityConverter}}">
             <Border Style="{StaticResource ModalCardStyle}" Width="620">
                 <StackPanel>
-                    <TextBlock Style="{StaticResource SectionHeaderTextBlockStyle}" HorizontalAlignment="Center" Text="Confirm" />
-                    <TextBlock Margin="0,12,0,20" Text="Is there enough time for Supervisor Transfers?" HorizontalAlignment="Center" />
+                    <TextBlock Style="{StaticResource SectionHeaderTextBlockStyle}"
+                               HorizontalAlignment="Center"
+                               Text="Confirm" />
+                    <TextBlock Margin="0,12,0,20"
+                               Text="Is there enough time for Supervisor Transfers?"
+                               HorizontalAlignment="Center" />
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Button Width="140" Style="{StaticResource PrimaryButtonStyle}" Content="Yes" Command="{Binding ConfirmTransferTimeCommand}" CommandParameter="Yes" />
-                        <Button Width="140" Style="{StaticResource SecondaryButtonStyle}" Content="No" Command="{Binding ConfirmTransferTimeCommand}" CommandParameter="No" />
+                        <Button Width="140"
+                                Style="{StaticResource PrimaryButtonStyle}"
+                                Content="Yes"
+                                Command="{Binding ConfirmTransferTimeCommand}"
+                                CommandParameter="Yes" />
+                        <Button Width="140"
+                                Style="{StaticResource SecondaryButtonStyle}"
+                                Content="No"
+                                Command="{Binding ConfirmTransferTimeCommand}"
+                                CommandParameter="No" />
                     </StackPanel>
                 </StackPanel>
             </Border>
