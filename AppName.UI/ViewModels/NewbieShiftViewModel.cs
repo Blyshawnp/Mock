@@ -46,10 +46,7 @@ public partial class NewbieShiftViewModel : ViewModelBase
     private string statusMessage = string.Empty;
 
     [ObservableProperty]
-    private bool isFinalAttemptYes;
-
-    [ObservableProperty]
-    private bool isFinalAttemptNo;
+    private bool? isFinalAttempt;
 
     private async Task LoadQuickReferenceAsync()
     {
