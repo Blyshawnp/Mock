@@ -10,6 +10,7 @@ public static class UiServiceRegistration
         services.AddTransient<HomeViewModel>();
         services.AddTransient<CallsViewModel>();
         services.AddTransient<SupervisorTransferViewModel>();
+        services.AddTransient<SupervisorTransferOnlyDialogViewModel>();
         services.AddTransient<ReviewViewModel>();
         services.AddTransient<SetupWizardViewModel>();
         services.AddTransient<TutorialViewModel>();

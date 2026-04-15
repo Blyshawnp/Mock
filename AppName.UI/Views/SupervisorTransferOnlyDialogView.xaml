@@ -1,0 +1,111 @@
+<UserControl x:Class="AppName.UI.Views.SupervisorTransferOnlyDialogView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:converters="clr-namespace:AppName.UI.Converters"
+             mc:Ignorable="d"
+             d:DesignHeight="480"
+             d:DesignWidth="760">
+    <UserControl.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid Background="#96060B14"
+              Visibility="{Binding ShowTransferSessionPromptDialog, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Border Width="700"
+                    Padding="24"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Background="{StaticResource Brush.Surface}"
+                    BorderBrush="{StaticResource Brush.Border}"
+                    BorderThickness="1"
+                    CornerRadius="12">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource SectionHeaderTextBlockStyle}"
+                               Text="Supervisor Transfer Only"
+                               HorizontalAlignment="Center" />
+                    <TextBlock Margin="0,14,0,22"
+                               Text="Did you conduct this candidate's mock call session?"
+                               TextWrapping="Wrap"
+                               HorizontalAlignment="Center" />
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Width="140"
+                                Style="{StaticResource PrimaryButtonStyle}"
+                                Content="Yes"
+                                Command="{Binding ConfirmTransferSessionPromptCommand}"
+                                CommandParameter="Yes" />
+                        <Button Width="140"
+                                Style="{StaticResource SecondaryButtonStyle}"
+                                Content="No"
+                                Margin="10,0,0,0"
+                                Command="{Binding ConfirmTransferSessionPromptCommand}"
+                                CommandParameter="No" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Grid Background="#96060B14"
+              Visibility="{Binding ShowTransferCandidatePickerDialog, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Border Width="860"
+                    Padding="24"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Background="{StaticResource Brush.Surface}"
+                    BorderBrush="{StaticResource Brush.Border}"
+                    BorderThickness="1"
+                    CornerRadius="12">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Style="{StaticResource SectionHeaderTextBlockStyle}"
+                               Text="Select Candidate from Session History" />
+
+                    <TextBox Grid.Row="1"
+                             Margin="0,10,0,10"
+                             Text="{Binding TransferCandidateSearch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <ListBox Grid.Row="2"
+                             ItemsSource="{Binding FilteredTransferHistoryCandidates}"
+                             SelectedItem="{Binding SelectedHistoryCandidate, Mode=TwoWay}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="6">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding CandidateName}" />
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding TesterName}"
+                                               HorizontalAlignment="Right"
+                                               Style="{StaticResource SubtleTextBlockStyle}" />
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <StackPanel Grid.Row="3"
+                                Margin="0,14,0,0"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Right">
+                        <Button Style="{StaticResource SecondaryButtonStyle}"
+                                Content="Cancel"
+                                Command="{Binding CancelTransferCandidatePickerCommand}" />
+                        <Button Style="{StaticResource PrimaryButtonStyle}"
+                                Content="OK"
+                                Margin="10,0,0,0"
+                                Command="{Binding ConfirmTransferCandidatePickerCommand}" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

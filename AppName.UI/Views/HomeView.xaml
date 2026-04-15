@@ -3,9 +3,15 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:views="clr-namespace:AppName.UI.Views"
+             xmlns:converters="clr-namespace:AppName.UI.Converters"
              mc:Ignorable="d"
              d:DesignHeight="800"
              d:DesignWidth="1200">
+    <UserControl.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+    </UserControl.Resources>
+
     <Grid Margin="24">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -19,8 +25,11 @@
                 <TextBlock Text="ACD" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="18" />
             </Border>
             <StackPanel Margin="16,0,0,0">
-                <TextBlock Style="{StaticResource PageTitleTextBlockStyle}"><Run Text="Welcome, "/><Run Text="{Binding WelcomeName}"/><Run Text="!"/></TextBlock>
+                <TextBlock Style="{StaticResource PageTitleTextBlockStyle}">
+                    <Run Text="Welcome, "/><Run Text="{Binding WelcomeName}"/><Run Text="!"/>
+                </TextBlock>
                 <TextBlock Style="{StaticResource SubtleTextBlockStyle}" Text="Mock Testing Suite — Certification" />
+                <TextBlock Style="{StaticResource SubtleTextBlockStyle}" Text="{Binding GlobalCandidateName, StringFormat=Candidate: {0}}" />
             </StackPanel>
         </StackPanel>
 
@@ -81,5 +90,7 @@
             </Border>
             <TextBlock Margin="0,12,0,0" Style="{StaticResource SubtleTextBlockStyle}" Text="{Binding StatusMessage}" />
         </StackPanel>
+
+        <views:SupervisorTransferOnlyDialogView Grid.RowSpan="4" />
     </Grid>
 </UserControl>

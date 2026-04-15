@@ -3,6 +3,7 @@ using AppName.Core.Models.Common;
 using AppName.Core.Models.Review;
 using AppName.Core.Models.Sessions;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 
 namespace AppName.UI.ViewModels;
@@ -45,6 +46,15 @@ public partial class SupervisorTransferViewModel : ViewModelBase
 
     [ObservableProperty]
     private bool isLookupLoading;
+
+    [ObservableProperty]
+    private string transferStatusMessage = string.Empty;
+
+    [RelayCommand]
+    private void MarkNcNs()
+    {
+        TransferStatusMessage = "Marked as NC/NS on Supervisor Call 1.";
+    }
 
     private async Task InitializeReasonsAsync()
     {
