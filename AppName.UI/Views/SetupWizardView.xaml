@@ -4,11 +4,13 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:converters="clr-namespace:AppName.UI.Converters"
+             xmlns:convertersUi="clr-namespace:AppName.UI.Converters"
              mc:Ignorable="d"
              d:DesignHeight="800"
              d:DesignWidth="1100">
     <UserControl.Resources>
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <convertersUi:NullableBoolEqualsConverter x:Key="NullableBoolEqualsConverter" />
     </UserControl.Resources>
 
     <Grid>
@@ -24,6 +26,16 @@
                 </Grid.RowDefinitions>
 
                 <TextBlock Style="{StaticResource PageTitleTextBlockStyle}" Text="The Basics" />
+
+                <ItemsControl Grid.Row="0" Margin="360,22,0,0"
+                              Visibility="{Binding HasValidationErrors, Converter={StaticResource BoolToVisibilityConverter}}"
+                              ItemsSource="{Binding ValidationErrors}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Foreground="{StaticResource Brush.Danger}" Text="{Binding StringFormat=• {0}}" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
 
                 <Border Grid.Row="1" Style="{StaticResource WorkflowCardBorderStyle}" Margin="0,18,0,12">
                     <Grid>
@@ -69,8 +81,8 @@
                                 <ColumnDefinition Width="180" />
                             </Grid.ColumnDefinitions>
                             <Label Content="Is the headset USB?" />
-                            <RadioButton Grid.Column="1" Content="Yes" IsChecked="{Binding IsHeadsetUsb}" GroupName="Usb" />
-                            <RadioButton Grid.Column="2" Content="No" GroupName="Usb" />
+                            <RadioButton Grid.Column="1" Content="Yes" IsChecked="{Binding IsHeadsetUsb, Mode=TwoWay, Converter={StaticResource NullableBoolEqualsConverter}, ConverterParameter=True}" GroupName="Usb" />
+                            <RadioButton Grid.Column="2" Content="No" IsChecked="{Binding IsHeadsetUsb, Mode=TwoWay, Converter={StaticResource NullableBoolEqualsConverter}, ConverterParameter=False}" GroupName="Usb" />
                         </Grid>
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -79,8 +91,8 @@
                                 <ColumnDefinition Width="180" />
                             </Grid.ColumnDefinitions>
                             <Label Content="Noise Cancelling Mic?" />
-                            <RadioButton Grid.Column="1" Content="Yes" IsChecked="{Binding HasNoiseCancellingMic}" GroupName="Noise" />
-                            <RadioButton Grid.Column="2" Content="No" GroupName="Noise" />
+                            <RadioButton Grid.Column="1" Content="Yes" IsChecked="{Binding HasNoiseCancellingMic, Mode=TwoWay, Converter={StaticResource NullableBoolEqualsConverter}, ConverterParameter=True}" GroupName="Noise" />
+                            <RadioButton Grid.Column="2" Content="No" IsChecked="{Binding HasNoiseCancellingMic, Mode=TwoWay, Converter={StaticResource NullableBoolEqualsConverter}, ConverterParameter=False}" GroupName="Noise" />
                         </Grid>
                         <Label Content="Brand / Model" />
                         <TextBox Width="540" HorizontalAlignment="Left" Text="{Binding HeadsetModel, UpdateSourceTrigger=PropertyChanged}" />
@@ -103,8 +115,8 @@
                                     <ColumnDefinition Width="130" />
                                 </Grid.ColumnDefinitions>
                                 <Label Content="Has VPN?" />
-                                <RadioButton Grid.Column="1" Content="Yes" IsChecked="{Binding HasVpn}" GroupName="Vpn" />
-                                <RadioButton Grid.Column="2" Content="No" GroupName="Vpn" />
+                                <RadioButton Grid.Column="1" Content="Yes" IsChecked="{Binding HasVpn, Mode=TwoWay, Converter={StaticResource NullableBoolEqualsConverter}, ConverterParameter=True}" GroupName="Vpn" />
+                                <RadioButton Grid.Column="2" Content="No" IsChecked="{Binding HasVpn, Mode=TwoWay, Converter={StaticResource NullableBoolEqualsConverter}, ConverterParameter=False}" GroupName="Vpn" />
                             </Grid>
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -113,8 +125,8 @@
                                     <ColumnDefinition Width="130" />
                                 </Grid.ColumnDefinitions>
                                 <Label Content="Can turn off?" />
-                                <RadioButton Grid.Column="1" Content="Yes" IsChecked="{Binding VpnCanTurnOff}" GroupName="VpnOff" />
-                                <RadioButton Grid.Column="2" Content="No" GroupName="VpnOff" />
+                                <RadioButton Grid.Column="1" Content="Yes" IsChecked="{Binding VpnCanTurnOff, Mode=TwoWay, Converter={StaticResource NullableBoolEqualsConverter}, ConverterParameter=True}" GroupName="VpnOff" />
+                                <RadioButton Grid.Column="2" Content="No" IsChecked="{Binding VpnCanTurnOff, Mode=TwoWay, Converter={StaticResource NullableBoolEqualsConverter}, ConverterParameter=False}" GroupName="VpnOff" />
                             </Grid>
                         </StackPanel>
                     </Border>
@@ -129,8 +141,8 @@
                                     <ColumnDefinition Width="130" />
                                 </Grid.ColumnDefinitions>
                                 <Label Content="Default browser?" />
-                                <RadioButton Grid.Column="1" Content="Yes" IsChecked="{Binding DefaultBrowserSet}" GroupName="BrowserDefault" />
-                                <RadioButton Grid.Column="2" Content="No" GroupName="BrowserDefault" />
+                                <RadioButton Grid.Column="1" Content="Yes" IsChecked="{Binding DefaultBrowserSet, Mode=TwoWay, Converter={StaticResource NullableBoolEqualsConverter}, ConverterParameter=True}" GroupName="BrowserDefault" />
+                                <RadioButton Grid.Column="2" Content="No" IsChecked="{Binding DefaultBrowserSet, Mode=TwoWay, Converter={StaticResource NullableBoolEqualsConverter}, ConverterParameter=False}" GroupName="BrowserDefault" />
                             </Grid>
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -139,8 +151,8 @@
                                     <ColumnDefinition Width="130" />
                                 </Grid.ColumnDefinitions>
                                 <Label Content="Extensions off?" />
-                                <RadioButton Grid.Column="1" Content="Yes" IsChecked="{Binding ExtensionsOff}" GroupName="Extensions" />
-                                <RadioButton Grid.Column="2" Content="No" GroupName="Extensions" />
+                                <RadioButton Grid.Column="1" Content="Yes" IsChecked="{Binding ExtensionsOff, Mode=TwoWay, Converter={StaticResource NullableBoolEqualsConverter}, ConverterParameter=True}" GroupName="Extensions" />
+                                <RadioButton Grid.Column="2" Content="No" IsChecked="{Binding ExtensionsOff, Mode=TwoWay, Converter={StaticResource NullableBoolEqualsConverter}, ConverterParameter=False}" GroupName="Extensions" />
                             </Grid>
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -149,8 +161,8 @@
                                     <ColumnDefinition Width="130" />
                                 </Grid.ColumnDefinitions>
                                 <Label Content="Pop-ups allowed?" />
-                                <RadioButton Grid.Column="1" Content="Yes" IsChecked="{Binding PopupsAllowed}" GroupName="Popups" />
-                                <RadioButton Grid.Column="2" Content="No" GroupName="Popups" />
+                                <RadioButton Grid.Column="1" Content="Yes" IsChecked="{Binding PopupsAllowed, Mode=TwoWay, Converter={StaticResource NullableBoolEqualsConverter}, ConverterParameter=True}" GroupName="Popups" />
+                                <RadioButton Grid.Column="2" Content="No" IsChecked="{Binding PopupsAllowed, Mode=TwoWay, Converter={StaticResource NullableBoolEqualsConverter}, ConverterParameter=False}" GroupName="Popups" />
                             </Grid>
                         </StackPanel>
                     </Border>

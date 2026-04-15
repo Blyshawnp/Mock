@@ -1,6 +1,7 @@
 using AppName.Core.Interfaces.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System.Collections.ObjectModel;
 
 namespace AppName.UI.ViewModels;
 
@@ -12,10 +13,15 @@ public partial class SetupWizardViewModel : ViewModelBase
     {
         _settingsService = settingsService;
         PronounOptions = ["", "He/Him", "She/Her", "They/Them"];
+        ValidationErrors = [];
         _ = InitializeAsync();
     }
 
     public IReadOnlyList<string> PronounOptions { get; }
+
+    public ObservableCollection<string> ValidationErrors { get; }
+
+    public bool HasValidationErrors => ValidationErrors.Count > 0;
 
     [ObservableProperty]
     private string testerName = string.Empty;
@@ -30,28 +36,28 @@ public partial class SetupWizardViewModel : ViewModelBase
     private bool finalAttempt;
 
     [ObservableProperty]
-    private bool isHeadsetUsb;
+    private bool? isHeadsetUsb;
 
     [ObservableProperty]
-    private bool hasNoiseCancellingMic;
+    private bool? hasNoiseCancellingMic;
 
     [ObservableProperty]
     private string headsetModel = string.Empty;
 
     [ObservableProperty]
-    private bool hasVpn;
+    private bool? hasVpn;
 
     [ObservableProperty]
-    private bool vpnCanTurnOff;
+    private bool? vpnCanTurnOff;
 
     [ObservableProperty]
-    private bool defaultBrowserSet;
+    private bool? defaultBrowserSet;
 
     [ObservableProperty]
-    private bool extensionsOff;
+    private bool? extensionsOff;
 
     [ObservableProperty]
-    private bool popupsAllowed;
+    private bool? popupsAllowed;
 
     [ObservableProperty]
     private bool showTechIssueDialog;
@@ -61,6 +67,9 @@ public partial class SetupWizardViewModel : ViewModelBase
 
     [ObservableProperty]
     private string statusMessage = string.Empty;
+
+    [ObservableProperty]
+    private bool isFormValid;
 
     private async Task InitializeAsync()
     {
@@ -73,7 +82,20 @@ public partial class SetupWizardViewModel : ViewModelBase
         {
             TesterName = "Shawn Bly";
         }
+
+        RefreshValidationState();
     }
+
+    partial void OnTesterNameChanged(string value) => RefreshValidationState();
+    partial void OnCandidateNameChanged(string value) => RefreshValidationState();
+    partial void OnHeadsetModelChanged(string value) => RefreshValidationState();
+    partial void OnIsHeadsetUsbChanged(bool? value) => RefreshValidationState();
+    partial void OnHasNoiseCancellingMicChanged(bool? value) => RefreshValidationState();
+    partial void OnHasVpnChanged(bool? value) => RefreshValidationState();
+    partial void OnVpnCanTurnOffChanged(bool? value) => RefreshValidationState();
+    partial void OnDefaultBrowserSetChanged(bool? value) => RefreshValidationState();
+    partial void OnExtensionsOffChanged(bool? value) => RefreshValidationState();
+    partial void OnPopupsAllowedChanged(bool? value) => RefreshValidationState();
 
     [RelayCommand]
     private void OpenTechIssueDialog() => ShowTechIssueDialog = true;
@@ -115,9 +137,81 @@ public partial class SetupWizardViewModel : ViewModelBase
         StatusMessage = "Marked as NC / NS.";
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanContinueBasics))]
     private void ContinueBasics()
     {
+        if (!ValidateForm())
+        {
+            StatusMessage = "Please complete all required fields before continuing.";
+            return;
+        }
+
         StatusMessage = "Basics complete. Continue clicked.";
+    }
+
+    private bool CanContinueBasics() => IsFormValid;
+
+    private void RefreshValidationState()
+    {
+        IsFormValid = ValidateForm();
+        ContinueBasicsCommand.NotifyCanExecuteChanged();
+        OnPropertyChanged(nameof(HasValidationErrors));
+    }
+
+    private bool ValidateForm()
+    {
+        ValidationErrors.Clear();
+
+        if (string.IsNullOrWhiteSpace(TesterName))
+        {
+            ValidationErrors.Add("Tester Name is required.");
+        }
+
+        if (string.IsNullOrWhiteSpace(CandidateName))
+        {
+            ValidationErrors.Add("Candidate Name is required.");
+        }
+
+        if (string.IsNullOrWhiteSpace(HeadsetModel))
+        {
+            ValidationErrors.Add("Headset Brand / Model is required.");
+        }
+
+        if (IsHeadsetUsb is null)
+        {
+            ValidationErrors.Add("Headset USB selection is required.");
+        }
+
+        if (HasNoiseCancellingMic is null)
+        {
+            ValidationErrors.Add("Noise Cancelling Mic selection is required.");
+        }
+
+        if (HasVpn is null)
+        {
+            ValidationErrors.Add("Has VPN selection is required.");
+        }
+
+        if (HasVpn is true && VpnCanTurnOff is null)
+        {
+            ValidationErrors.Add("Can turn off VPN selection is required when VPN is enabled.");
+        }
+
+        if (DefaultBrowserSet is null)
+        {
+            ValidationErrors.Add("Default browser selection is required.");
+        }
+
+        if (ExtensionsOff is null)
+        {
+            ValidationErrors.Add("Extensions Off selection is required.");
+        }
+
+        if (PopupsAllowed is null)
+        {
+            ValidationErrors.Add("Pop-ups Allowed selection is required.");
+        }
+
+        return ValidationErrors.Count == 0;
     }
 }
