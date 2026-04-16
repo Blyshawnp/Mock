@@ -1,0 +1,209 @@
+<UserControl x:Class="AppName.UI.Views.CallsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:AppName.UI.Controls"
+             xmlns:converters="clr-namespace:AppName.UI.Converters"
+             xmlns:enums="clr-namespace:AppName.Core.Models.Enums;assembly=AppName.Core"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             mc:Ignorable="d"
+             d:DesignHeight="900"
+             d:DesignWidth="1200">
+    <UserControl.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <ObjectDataProvider x:Key="CallTypeValues"
+                            MethodName="GetValues"
+                            ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="enums:DonorScenario" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+    </UserControl.Resources>
+
+    <Grid>
+        <ScrollViewer>
+            <Grid Margin="24">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <StackPanel Orientation="Horizontal" Grid.Row="0">
+                    <TextBlock Style="{StaticResource PageTitleTextBlockStyle}" Text="Call #1" />
+                    <TextBlock Margin="20,20,0,0" Style="{StaticResource SubtleTextBlockStyle}" Text="Progress:" />
+                    <TextBlock Margin="8,20,0,0" Style="{StaticResource SubtleTextBlockStyle}" Text="{Binding ProgressPercent, StringFormat={}{0:F0}%}" />
+                </StackPanel>
+
+                <controls:WarningBannerControl Grid.Row="1"
+                                               Margin="0,8,0,10"
+                                               BannerVisibility="{Binding HasWarnings, Converter={StaticResource BoolToVisibilityConverter}}"
+                                               ItemsSource="{Binding Warnings}" />
+
+                <ItemsControl Grid.Row="2" ItemsSource="{Binding Calls}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Visibility="{Binding IsVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Border Grid.Column="0" Style="{StaticResource WorkflowCardBorderStyle}" Margin="0,0,8,12">
+                                        <StackPanel>
+                                            <TextBlock Style="{StaticResource SectionHeaderTextBlockStyle}" Text="Call Setup" />
+                                            <Label Content="Call Type" />
+                                            <ComboBox ItemsSource="{Binding Source={StaticResource CallTypeValues}}"
+                                                      SelectedItem="{Binding DonorScenario, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                            <Label Content="Show" />
+                                            <ComboBox>
+                                                <ComboBoxItem Content="New Divas – Live in Vienna" />
+                                            </ComboBox>
+                                            <Label Content="Caller" />
+                                            <ComboBox>
+                                                <ComboBoxItem Content="Sam Smith" />
+                                            </ComboBox>
+                                            <Label Content="Donation" />
+                                            <ComboBox>
+                                                <ComboBoxItem Content="$216" />
+                                            </ComboBox>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Border Grid.Column="1" Style="{StaticResource WorkflowCardBorderStyle}" Background="#FF033929" BorderBrush="#FF22A46D" Margin="8,0,0,12">
+                                        <StackPanel>
+                                            <DockPanel>
+                                                <TextBlock Style="{StaticResource SectionHeaderTextBlockStyle}" Text="SCENARIO" Foreground="#FF4EF6A2" />
+                                                <Button DockPanel.Dock="Right" Style="{StaticResource SecondaryButtonStyle}" Content="Regenerate" FontSize="22" Padding="10,4" />
+                                            </DockPanel>
+                                            <TextBlock TextWrapping="Wrap" Margin="0,8,0,0" Text="For this call you will portray Sam Smith. Sam is a new donor wishing to make a one-time donation of $216 to support New Divas — Live in Vienna." />
+                                            <TextBlock Margin="0,10,0,0" Text="• Thank You Gift: The New Divas – Best of Live in Vienna (CD) + Wine Glasses + PBS Retro Speaker" />
+                                            <TextBlock Text="• Phone Type: Mobile" />
+                                            <TextBlock Text="• Text Messages: No" />
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+
+                                <Border Style="{StaticResource WorkflowCardBorderStyle}">
+                                    <StackPanel>
+                                        <TextBlock Style="{StaticResource SectionHeaderTextBlockStyle}" Text="Call Result" />
+                                        <controls:PassFailToggleControl Margin="0,10,0,0" Outcome="{Binding Outcome, Mode=TwoWay}" />
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Style="{StaticResource WorkflowCardBorderStyle}">
+                                    <StackPanel>
+                                        <TextBlock Style="{StaticResource SectionHeaderTextBlockStyle}" Text="Coaching Given" />
+                                        <TextBlock Style="{StaticResource SubtleTextBlockStyle}" Text="One or more may be selected" />
+                                        <Grid Margin="0,10,0,0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <StackPanel>
+                                                <CheckBox Content="Show appreciation" />
+                                                <CheckBox Content="Phonetics table provided to candidate" />
+                                                <CheckBox Content="Don't Ask, Just Verify Address and Phone Number" />
+                                                <CheckBox Content="Verification" />
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="1">
+                                                <CheckBox Content="Read script verbatim" />
+                                                <CheckBox Content="Use effective script navigation" />
+                                                <CheckBox Content="Other" IsChecked="{Binding ShowOtherCoachingText}" />
+                                            </StackPanel>
+                                        </Grid>
+
+                                        <TextBlock Margin="0,10,0,0" Text="Other Coaching Notes" />
+                                        <TextBox Height="82" Text="{Binding OtherCoachingText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Style="{StaticResource WorkflowCardBorderStyle}" Background="#FF3A0D1A" BorderBrush="#FF8A2A3C">
+                                    <StackPanel>
+                                        <TextBlock Style="{StaticResource SectionHeaderTextBlockStyle}" Text="Fail Reasons" Foreground="#FFFF4E68" />
+                                        <TextBlock Style="{StaticResource SubtleTextBlockStyle}" Text="One or more may be selected" />
+                                        <Grid Margin="0,10,0,0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel>
+                                                <CheckBox Content="Skipped parts of script" />
+                                                <CheckBox Content="Volunteered info" />
+                                                <CheckBox Content="Wrong donation" />
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="1">
+                                                <CheckBox Content="Paraphrased script" />
+                                                <CheckBox Content="Wrong thank you gift" />
+                                                <CheckBox Content="Other" IsChecked="{Binding ShowOtherFailText}" />
+                                            </StackPanel>
+                                        </Grid>
+                                        <TextBlock Margin="0,10,0,0" Text="Other Fail Notes" />
+                                        <TextBox Height="82" Text="{Binding OtherFailText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <Border Grid.Row="3" Style="{StaticResource WorkflowCardBorderStyle}" Margin="0,12,0,0">
+                    <DockPanel>
+                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                            <Button Style="{StaticResource SecondaryButtonStyle}" Content="Back" />
+                            <Button Style="{StaticResource DangerButtonStyle}" Content="Stopped Responding" Command="{Binding MarkStoppedRespondingCommand}" Margin="0,0,8,0" />
+                            <Button Style="{StaticResource SecondaryButtonStyle}" Content="Tech Issue" Command="{Binding OpenConfirmTransferTimeCommand}" Margin="0,0,8,0" />
+                            <Button Style="{StaticResource SecondaryButtonStyle}" Content="No Coaching" Command="{Binding ShowNoCoachingWarningCommand}" Margin="0,0,8,0" />
+                            <Button Style="{StaticResource SecondaryButtonStyle}" Content="Call Type" Command="{Binding ShowCallTypeWarningCommand}" />
+                        </StackPanel>
+
+                        <Button DockPanel.Dock="Right" Width="180" Style="{StaticResource PrimaryButtonStyle}" Content="Continue" Command="{Binding ContinueCallCommand}" />
+                    </DockPanel>
+                </Border>
+                <TextBlock Grid.Row="4" Margin="0,10,0,0" Style="{StaticResource SubtleTextBlockStyle}" Text="{Binding CallStatusMessage}" />
+            </Grid>
+        </ScrollViewer>
+
+        <Grid Background="#96060B14" Visibility="{Binding ShowNoCoachingDialog, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Border Style="{StaticResource ModalCardStyle}" Width="620">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource SectionHeaderTextBlockStyle}" HorizontalAlignment="Center" Text="No Coaching" />
+                    <TextBlock Margin="0,14,0,20" TextWrapping="Wrap" Text="You did not select any coaching for this call. Continue anyway?" />
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Width="140" Style="{StaticResource PrimaryButtonStyle}" Content="Yes" Command="{Binding CloseNoCoachingWarningCommand}" />
+                        <Button Width="140" Style="{StaticResource SecondaryButtonStyle}" Content="No" Command="{Binding CloseNoCoachingWarningCommand}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Grid Background="#96060B14" Visibility="{Binding ShowCallTypeDialog, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Border Style="{StaticResource ModalCardStyle}" Width="740">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource SectionHeaderTextBlockStyle}" HorizontalAlignment="Center" Text="Call Type Error" />
+                    <TextBlock Margin="0,12,0,8" Text="You must pass one New Donor and one Existing Member call." TextWrapping="Wrap" />
+                    <TextBlock Margin="0,0,0,20" Text="Change this call's type to an 'Existing Member' scenario." TextWrapping="Wrap" />
+                    <Button Width="170" HorizontalAlignment="Center" Style="{StaticResource PrimaryButtonStyle}" Content="OK" Command="{Binding CloseCallTypeWarningCommand}" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Grid Background="#96060B14" Visibility="{Binding ShowConfirmTransferTimeDialog, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Border Style="{StaticResource ModalCardStyle}" Width="640">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource SectionHeaderTextBlockStyle}" HorizontalAlignment="Center" Text="Confirm" />
+                    <TextBlock Margin="0,14,0,20" HorizontalAlignment="Center" Text="Is there enough time for Supervisor Transfers?" />
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Width="140" Style="{StaticResource PrimaryButtonStyle}" Content="Yes" Command="{Binding ConfirmTransferTimeCommand}" CommandParameter="Yes" />
+                        <Button Width="140" Style="{StaticResource SecondaryButtonStyle}" Content="No" Command="{Binding ConfirmTransferTimeCommand}" CommandParameter="No" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

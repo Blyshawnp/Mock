@@ -1,0 +1,10 @@
+{
+  "theme": "Light",
+  "soundsEnabled": true,
+  "defaultSaveFolder": "",
+  "autosaveMinutes": 5,
+  "firstRunComplete": false,
+  "tutorialCompleted": false,
+  "beginnerModeEnabled": true,
+  "displayName": ""
+}
