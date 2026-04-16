@@ -34,17 +34,27 @@ public sealed class FallbackSummaryService : ISummaryService
 
     public async Task<string> GenerateFailSummaryAsync(EvaluationSession session, CancellationToken cancellationToken = default)
     {
+        var failedCalls = session.Calls.Where(x => x.IsVisible && x.Outcome == CallOutcome.Fail).OrderBy(x => x.CallNumber).ToList();
+        var failedTransfers = session.Transfers.Where(x => x.Outcome == TransferOutcome.Fail).OrderBy(x => x.AttemptNumber).ToList();
+
+        if (failedCalls.Count == 0 && failedTransfers.Count == 0)
+        {
+            await TryLogAsync($"Generated fallback fail summary for session {session.SessionId}: N/A.", cancellationToken);
+            return "Fail Summary
+- N/A";
+        }
+
         var builder = new StringBuilder();
         builder.AppendLine("Fail Summary");
 
-        foreach (var call in session.Calls.Where(x => x.IsVisible && x.Outcome == CallOutcome.Fail).OrderBy(x => x.CallNumber))
+        foreach (var call in failedCalls)
         {
             cancellationToken.ThrowIfCancellationRequested();
             var reasons = call.FailSelections.Count == 0 ? "No fail reasons selected" : string.Join(", ", call.FailSelections);
             builder.AppendLine($"- Call {call.CallNumber}: {reasons}");
         }
 
-        foreach (var transfer in session.Transfers.Where(x => x.Outcome == TransferOutcome.Fail).OrderBy(x => x.AttemptNumber))
+        foreach (var transfer in failedTransfers)
         {
             cancellationToken.ThrowIfCancellationRequested();
             var reason = string.IsNullOrWhiteSpace(transfer.Reason) ? "No reason recorded" : transfer.Reason;
