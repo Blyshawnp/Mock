@@ -2,6 +2,7 @@ using AppName.Core.Interfaces.Services;
 using AppName.Core.Models.Common;
 using AppName.Core.Models.Review;
 using AppName.Core.Models.Sessions;
+using AppName.UI.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
@@ -12,15 +13,19 @@ public partial class SupervisorTransferViewModel : ViewModelBase
 {
     private readonly ISessionStateService _sessionStateService;
     private readonly ILookupTableService _lookupTableService;
+    private readonly IAudioFeedbackService _audioFeedbackService;
     private readonly SemaphoreSlim _reasonLoadLock = new(1, 1);
     private bool _isInitializing = true;
+    private bool _hadValidationErrors;
 
     public SupervisorTransferViewModel(
         ISessionStateService sessionStateService,
-        ILookupTableService lookupTableService)
+        ILookupTableService lookupTableService,
+        IAudioFeedbackService audioFeedbackService)
     {
         _sessionStateService = sessionStateService;
         _lookupTableService = lookupTableService;
+        _audioFeedbackService = audioFeedbackService;
 
         Transfers = [];
         Warnings = [];
@@ -54,6 +59,7 @@ public partial class SupervisorTransferViewModel : ViewModelBase
     private void MarkNcNs()
     {
         TransferStatusMessage = "Marked as NC/NS on Supervisor Call 1.";
+        _ = _audioFeedbackService.PlayErrorAsync();
     }
 
     private async Task InitializeReasonsAsync()
@@ -124,6 +130,14 @@ public partial class SupervisorTransferViewModel : ViewModelBase
         }
 
         HasWarnings = Warnings.Count > 0;
+
+        var hasValidationErrors = Warnings.Any(x => x.Severity == Core.Models.Enums.WarningSeverity.Error);
+        if (hasValidationErrors && !_hadValidationErrors)
+        {
+            _ = _audioFeedbackService.PlayErrorAsync();
+        }
+
+        _hadValidationErrors = hasValidationErrors;
     }
 
     private void SyncTransfers(EvaluationSession session)

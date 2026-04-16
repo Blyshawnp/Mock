@@ -2,6 +2,7 @@ using AppName.Core.Interfaces.Services;
 using AppName.Core.Models.Common;
 using AppName.Core.Models.Review;
 using AppName.Core.Models.Sessions;
+using AppName.UI.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
@@ -14,16 +15,20 @@ public partial class ReviewViewModel : ViewModelBase
     private readonly ISessionStateService _sessionStateService;
     private readonly ISummaryService _summaryService;
     private readonly ILogService _logService;
+    private readonly IAudioFeedbackService _audioFeedbackService;
     private bool _isInitializing = true;
+    private bool _hadValidationErrors;
 
     public ReviewViewModel(
         ISessionStateService sessionStateService,
         ISummaryService summaryService,
-        ILogService logService)
+        ILogService logService,
+        IAudioFeedbackService audioFeedbackService)
     {
         _sessionStateService = sessionStateService;
         _summaryService = summaryService;
         _logService = logService;
+        _audioFeedbackService = audioFeedbackService;
 
         Warnings = [];
 
@@ -133,6 +138,7 @@ public partial class ReviewViewModel : ViewModelBase
         SubmitConfirmed = true;
         SaveReviewState(coachingGenerated: null, failGenerated: null);
         SummaryStatusMessage = "Review submitted.";
+        _ = _audioFeedbackService.PlaySuccessAsync();
     }
 
     partial void OnCoachingSummaryChanged(string value)
@@ -190,7 +196,15 @@ public partial class ReviewViewModel : ViewModelBase
 
         SessionSummary = BuildSessionSummary(session);
         HasWarnings = Warnings.Count > 0;
-        IsReadyForSubmit = !Warnings.Any(x => x.Severity == Core.Models.Enums.WarningSeverity.Error)
+        var hasValidationErrors = Warnings.Any(x => x.Severity == Core.Models.Enums.WarningSeverity.Error);
+        if (hasValidationErrors && !_hadValidationErrors)
+        {
+            _ = _audioFeedbackService.PlayErrorAsync();
+        }
+
+        _hadValidationErrors = hasValidationErrors;
+
+        IsReadyForSubmit = !hasValidationErrors
                            && !string.IsNullOrWhiteSpace(CoachingSummary)
                            && !string.IsNullOrWhiteSpace(FailSummary);
     }

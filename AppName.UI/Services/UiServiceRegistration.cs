@@ -7,6 +7,7 @@ public static class UiServiceRegistration
 {
     public static IServiceCollection AddAppNameUi(this IServiceCollection services)
     {
+        services.AddSingleton<IAudioFeedbackService, AudioFeedbackService>();
         services.AddTransient<HomeViewModel>();
         services.AddTransient<CallsViewModel>();
         services.AddTransient<SupervisorTransferViewModel>();

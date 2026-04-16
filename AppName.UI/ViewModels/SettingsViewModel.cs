@@ -1,6 +1,7 @@
 using AppName.Core.Interfaces.Services;
 using AppName.Core.Models.Enums;
 using AppName.Core.Models.Lookup;
+using AppName.UI.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
@@ -10,10 +11,12 @@ namespace AppName.UI.ViewModels;
 public partial class SettingsViewModel : ViewModelBase
 {
     private readonly ILookupTableService _lookupTableService;
+    private readonly IAudioFeedbackService _audioFeedbackService;
 
-    public SettingsViewModel(ILookupTableService lookupTableService)
+    public SettingsViewModel(ILookupTableService lookupTableService, IAudioFeedbackService audioFeedbackService)
     {
         _lookupTableService = lookupTableService;
+        _audioFeedbackService = audioFeedbackService;
 
         CallTypes = [];
         SupervisorReasons = [];
@@ -105,6 +108,7 @@ public partial class SettingsViewModel : ViewModelBase
             if (!ValidateAll())
             {
                 StatusMessage = "Cannot save. Fix validation errors.";
+                _ = _audioFeedbackService.PlayErrorAsync();
                 return;
             }
 

@@ -1,4 +1,5 @@
 using AppName.Core.Interfaces.Services;
+using AppName.UI.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
@@ -8,10 +9,12 @@ namespace AppName.UI.ViewModels;
 public partial class SetupWizardViewModel : ViewModelBase
 {
     private readonly ISettingsService _settingsService;
+    private readonly IAudioFeedbackService _audioFeedbackService;
 
-    public SetupWizardViewModel(ISettingsService settingsService)
+    public SetupWizardViewModel(ISettingsService settingsService, IAudioFeedbackService audioFeedbackService)
     {
         _settingsService = settingsService;
+        _audioFeedbackService = audioFeedbackService;
         PronounOptions = ["", "He/Him", "She/Her", "They/Them"];
         ValidationErrors = [];
         _ = InitializeAsync();
@@ -123,18 +126,21 @@ public partial class SetupWizardViewModel : ViewModelBase
     private void MarkStoppedResponding()
     {
         StatusMessage = "Marked as Stopped Responding.";
+        _ = _audioFeedbackService.PlayErrorAsync();
     }
 
     [RelayCommand]
     private void MarkNotReady()
     {
         StatusMessage = "Marked as Not Ready.";
+        _ = _audioFeedbackService.PlayErrorAsync();
     }
 
     [RelayCommand]
     private void MarkNcNs()
     {
         StatusMessage = "Marked as NC / NS.";
+        _ = _audioFeedbackService.PlayErrorAsync();
     }
 
     [RelayCommand(CanExecute = nameof(CanContinueBasics))]
@@ -143,6 +149,7 @@ public partial class SetupWizardViewModel : ViewModelBase
         if (!ValidateForm())
         {
             StatusMessage = "Please complete all required fields before continuing.";
+            _ = _audioFeedbackService.PlayErrorAsync();
             return;
         }
 
